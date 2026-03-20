@@ -1,0 +1,40 @@
+
+> conhece-siclus@0.1.0 build
+> next build
+
+   Ôû▓ Next.js 15.1.11
+   - Environments: .env
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/admin/AdminClient.tsx
+409:23  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/HomeClient.tsx
+218:21  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/4) ...
+   Generating static pages (1/4) 
+   Generating static pages (2/4) 
+   Generating static pages (3/4) 
+ Ô£ô Generating static pages (4/4)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Ôöî ãÆ /                                    8 kB            113 kB
+Ôö£ Ôùï /_not-found                          979 B           106 kB
+Ôöö ãÆ /admin                               3.99 kB         109 kB
++ First Load JS shared by all            105 kB
+  Ôö£ chunks/4bd1b696-48c2ae5becf7061b.js  52.9 kB
+  Ôö£ chunks/517-2b0d7fdfac2327ab.js       50.5 kB
+  Ôöö other shared chunks (total)          1.97 kB
+
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

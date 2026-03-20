@@ -1,0 +1,109 @@
+node_modules/@prisma/client/runtime/library.d.ts(73,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@prisma/client/runtime/library.d.ts(401,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/@prisma/client/runtime/library.d.ts(2037,5): error TS18028: Private identifiers are only available when targeting ECMAScript 2015 and higher.
+node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+node_modules/next/dist/build/webpack-config.d.ts(9,104): error TS2694: Namespace '"D:/samuel/conhece-siclus/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+node_modules/next/dist/build/webpack/loaders/next-app-loader/index.d.ts(1,13): error TS2613: Module '"D:/samuel/conhece-siclus/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "D:/samuel/conhece-siclus/node_modules/next/dist/compiled/webpack/webpack"' instead?
+node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/client/components/http-access-fallback/error-boundary.d.ts(11,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/server/app-render/entry-base.d.ts(1,114): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+node_modules/next/dist/server/app-render/entry-base.d.ts(2,27): error TS2307: Cannot find module 'react-server-dom-webpack/static.edge' or its corresponding type declarations.
+node_modules/next/dist/server/render.d.ts(14,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/server/web/spec-extension/adapters/headers.d.ts(39,16): error TS2304: Cannot find name 'HeadersIterator'.
+node_modules/next/dist/server/web/spec-extension/adapters/headers.d.ts(40,13): error TS2304: Cannot find name 'HeadersIterator'.
+node_modules/next/dist/server/web/spec-extension/adapters/headers.d.ts(41,15): error TS2304: Cannot find name 'HeadersIterator'.
+node_modules/next/dist/server/web/spec-extension/adapters/headers.d.ts(42,26): error TS2304: Cannot find name 'HeadersIterator'.
+node_modules/next/dist/shared/lib/amp-context.shared-runtime.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/app-router-context.shared-runtime.d.ts(4,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/head-manager-context.shared-runtime.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/image-config-context.shared-runtime.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/loadable-context.shared-runtime.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/loadable.shared-runtime.d.ts(21,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/router-context.shared-runtime.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/server-inserted-html.shared-runtime.d.ts(1,8): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+node_modules/next/dist/shared/lib/utils.d.ts(10,13): error TS1192: Module '"fs"' has no default export.
+node_modules/next/dist/types.d.ts(8,13): error TS1259: Module '"D:/samuel/conhece-siclus/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+src/app/actions.ts(6,8): error TS1259: Module '"path"' can only be default-imported using the 'esModuleInterop' flag
+src/app/admin/AdminClient.tsx(47,47): error TS2339: Property 'id' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(49,31): error TS2339: Property 'conteudo' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(50,28): error TS2339: Property 'grupo' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(64,14): error TS2339: Property 'categoriaId' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(192,47): error TS2339: Property 'id' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(193,30): error TS2339: Property 'nome' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(251,7): error TS2552: Cannot find name 'setEdicaoImagemUrl'. Did you mean 'setEdicaoImages'?
+src/app/admin/AdminClient.tsx(252,7): error TS2552: Cannot find name 'setEdicaoImagemFile'. Did you mean 'setEdicaoImages'?
+src/app/admin/AdminClient.tsx(253,7): error TS2304: Cannot find name 'setEdicaoYoutubeUrl'.
+src/app/admin/AdminClient.tsx(259,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(261,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(262,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(263,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(264,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(265,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(268,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(276,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(278,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(283,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(284,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(287,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(296,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(297,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(300,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(307,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(312,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(313,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(320,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(331,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(332,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(333,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(334,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(335,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(336,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(337,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(346,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(348,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(355,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(356,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(357,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(363,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(365,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(365,36): error TS2339: Property 'id' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(365,51): error TS2339: Property 'id' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(366,26): error TS2339: Property 'grupo' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(366,42): error TS2339: Property 'grupo' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(366,56): error TS2339: Property 'nome' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(366,69): error TS2339: Property 'nome' does not exist on type 'Submenu'.
+src/app/admin/AdminClient.tsx(373,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(374,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(375,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(385,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(386,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(387,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(389,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(390,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(391,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(403,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(416,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(417,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(425,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(426,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(427,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(429,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(430,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(431,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(448,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(449,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(450,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(451,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(452,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(460,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(468,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(478,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(488,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(489,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(497,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(505,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(527,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(528,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+src/app/admin/AdminClient.tsx(537,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
