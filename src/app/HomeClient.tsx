@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Settings, Menu, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { Categoria, Submenu } from '../types';
-import { normalizeText } from '../lib/utils';
+import { normalizeText, sortCategorias } from '../lib/utils';
 import { SearchBar } from '../components/SearchBar';
 import { Sidebar } from '../components/Sidebar';
 import { YoutubePlayer } from '../components/YoutubePlayer';
@@ -43,7 +43,8 @@ export default function HomeClient({
       }
       return null;
     })
-    .filter((cat): cat is Categoria => cat !== null);
+    .filter((cat): cat is Categoria => cat !== null)
+    .sort(sortCategorias);
 
   const allMatchingSubmenus = initialCategorias.flatMap(cat =>
     cat.submenus.filter(sub => {
@@ -99,7 +100,7 @@ export default function HomeClient({
           allMatchingSubmenus={allMatchingSubmenus as any}
           onResultClick={handleResultClick}
         />
-
+        {/* Configurações */}
         <div className="flex items-center gap-4">
           <Link
             href="/admin"

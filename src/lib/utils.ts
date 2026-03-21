@@ -16,5 +16,38 @@ export const getYoutubeEmbedUrl = (url: string) => {
   return embedUrl;
 };
 
-export const normalizeString = (val: string) => 
+export const normalizeString = (val: string) =>
   val.toLowerCase().trim().replace(/s$/, '');
+
+export const categoryOrder = [
+  'Associados',
+  'Associado',
+  'Ocorrências e Agenda',
+  'Ocorrências E agenda',
+  'Financeiro',
+  'Orçamento',
+  'Contábil',
+  'Materiais',
+  'Mala Direta',
+  'Entrada/Saída',
+  'Esportes',
+  'Eventos',
+  'Jurídico',
+  'Administrativo',
+  'Parâmetros',
+  'SiclusNav',
+  'Siclus Nav',
+  'SiclusAcesso',
+  'Siclus Acesso',
+  'Catraca Control ID',
+  'Catraca Topdata',
+];
+
+export const sortCategorias = (a: { nome: string }, b: { nome: string }) => {
+  const indexA = categoryOrder.indexOf(a.nome);
+  const indexB = categoryOrder.indexOf(b.nome);
+  if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+  if (indexA !== -1) return -1;
+  if (indexB !== -1) return 1;
+  return a.nome.localeCompare(b.nome);
+};

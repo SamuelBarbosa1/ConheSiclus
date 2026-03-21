@@ -11,11 +11,11 @@ import {
 } from '../actions';
 import { useRouter } from 'next/navigation';
 import { Categoria, Submenu } from '../../types';
-import { normalizeString } from '../../lib/utils';
+import { normalizeString, sortCategorias } from '../../lib/utils';
 import { MediaEditor } from '../../components/MediaEditor';
 import { RelatedArticlesEditor } from '../../components/RelatedArticlesEditor';
 import { Toast, ToastType } from '../../components/Toast';
-import { Loader2, Plus, Save, Trash2, Edit3, X, AlertTriangle } from 'lucide-react';
+import { Loader2, Plus, Save, Trash2, Edit3, X, AlertTriangle, Settings } from 'lucide-react';
 
 // Single Modal Component for all dialogues
 interface ModalProps {
@@ -73,10 +73,10 @@ function Modal({
           </div>
           <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><X size={18} /></button>
         </div>
-        
+
         <div className="p-5 space-y-4">
           {message && <p className="text-sm text-gray-650 font-medium leading-normal">{message}</p>}
-          
+
           {showInput && (
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-gray-400 uppercase">{inputPlaceholder || 'Nome'}</label>
@@ -115,9 +115,8 @@ function Modal({
           <button
             onClick={() => onConfirm(val, val2)}
             disabled={isLoading}
-            className={`flex-1 px-4 py-2 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${
-              isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
+            className={`flex-1 px-4 py-2 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm ${isDanger ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'
+              }`}
           >
             {isLoading && <Loader2 className="animate-spin" size={16} />}
             {confirmLabel}
@@ -227,7 +226,7 @@ export default function AdminClient({
         await criarSubmenu(fd); showToast('Submenu adicionado!'); router.refresh();
       }
       setNovaCategoriaNome(''); setNovoSubmenuNome(''); setNovoGrupo('');
-    } catch (e: any) { showToast(e.message, 'error'); } 
+    } catch (e: any) { showToast(e.message, 'error'); }
     finally { setIsSubmittingEstrutura(false); }
   };
 
@@ -362,7 +361,7 @@ export default function AdminClient({
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 select-none font-sans text-gray-900">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <Modal isOpen={!!modalConfig} onClose={closeModal} {...(modalConfig || { title: '', onConfirm: () => {} })} />
+      <Modal isOpen={!!modalConfig} onClose={closeModal} {...(modalConfig || { title: '', onConfirm: () => { } })} />
 
       {/* SEÇÃO 1: ESTRUTURA */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
@@ -370,7 +369,7 @@ export default function AdminClient({
           <Plus size={18} className="text-teal-600" />
           <h2 className="font-bold text-gray-700">1. Gerenciar Estrutura</h2>
         </div>
-        
+
         <div className="p-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="space-y-1">
@@ -378,7 +377,7 @@ export default function AdminClient({
               <input
                 type="text" list="cat-list" value={novaCategoriaNome} onChange={(e) => setNovaCategoriaNome(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
-                placeholder="Ex: TI"
+                placeholder="Ex: Associado"
               />
               <datalist id="cat-list">{initialCategorias.map(c => <option key={c.id} value={c.nome} />)}</datalist>
             </div>
@@ -387,7 +386,7 @@ export default function AdminClient({
               <input
                 type="text" value={novoSubmenuNome} onChange={(e) => setNovoSubmenuNome(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
-                placeholder="Ex: Férias"
+                placeholder="Ex: Cadastro"
               />
             </div>
             <div className="space-y-1">
@@ -436,7 +435,7 @@ export default function AdminClient({
                 onChange={(e) => { setSelectedCategoriaId(e.target.value); setSelectedSubmenuId(''); }}
               >
                 <option value="">Selecione...</option>
-                {initialCategorias.sort((a,b) => a.nome.localeCompare(b.nome)).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                {initialCategorias.sort(sortCategorias).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
               </select>
             </div>
             <div className="space-y-1">
@@ -448,7 +447,7 @@ export default function AdminClient({
                 disabled={!selectedCategoriaId}
               >
                 <option value="">Selecione...</option>
-                {filteredSubmenus.sort((a,b) => a.nome.localeCompare(b.nome)).map(s => <option key={s.id} value={s.id}>{s.grupo ? `[${s.grupo}] ${s.nome}` : s.nome}</option>)}
+                {filteredSubmenus.sort((a, b) => a.nome.localeCompare(b.nome)).map(s => <option key={s.id} value={s.id}>{s.grupo ? `[${s.grupo}] ${s.nome}` : s.nome}</option>)}
               </select>
             </div>
           </div>
@@ -464,10 +463,10 @@ export default function AdminClient({
               </div>
 
               <MediaEditor images={edicaoImages} setImages={setEdicaoImages} videoUrls={edicaoVideoUrls} setVideoUrls={setEdicaoVideoUrls} />
-              
-              <RelatedArticlesEditor 
-                initialSubmenus={initialSubmenus} initialCategorias={initialCategorias} 
-                selectedSubmenuId={selectedSubmenuId} relatedIds={edicaoRelatedIds} 
+
+              <RelatedArticlesEditor
+                initialSubmenus={initialSubmenus} initialCategorias={initialCategorias}
+                selectedSubmenuId={selectedSubmenuId} relatedIds={edicaoRelatedIds}
                 setRelatedIds={setEdicaoRelatedIds} searchRelated={searchRelated} setSearchRelated={setSearchRelated}
               />
 
@@ -537,7 +536,8 @@ export default function AdminClient({
                   className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg flex items-center gap-2 shadow-sm"
                 >
                   <Plus size={18} />
-                  + Novo Submenu Aqui
+                  <Settings size={18} />
+                  Novo Submenu Aqui
                 </button>
               </div>
 
