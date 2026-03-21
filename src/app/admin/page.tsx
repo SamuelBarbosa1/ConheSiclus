@@ -1,5 +1,10 @@
 import { getCategorias, getSubmenus } from '../actions';
 import AdminClient from './AdminClient';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "ConheSiclusAdmin",
+};
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

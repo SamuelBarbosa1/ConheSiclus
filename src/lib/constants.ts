@@ -1,0 +1,36 @@
+import {
+  Users,
+  FileText,
+  BarChart2,
+  Calendar,
+  DollarSign,
+  Settings,
+  Mail,
+  Wrench,
+  Shield,
+  Briefcase,
+  Play,
+  Trophy,
+  ArrowLeftRight,
+  Target,
+} from 'lucide-react';
+import React from 'react';
+
+export const iconMap: Record<string, React.ElementType> = {
+  Associados: Users,
+  'Ocorrências e Agenda': Calendar,
+  Financeiro: DollarSign,
+  Orçamento: BarChart2,
+  Contábil: FileText,
+  Materiais: Wrench,
+  'Mala Direta': Mail,
+  'Entrada/Saída': ArrowLeftRight,
+  Esportes: Trophy,
+  Eventos: Play,
+  Jurídico: Shield,
+  Administrativo: Briefcase,
+  Parâmetros: Settings,
+  Documentos: FileText,
+  Relatórios: BarChart2,
+  default: Target,
+};

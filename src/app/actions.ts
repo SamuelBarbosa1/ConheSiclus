@@ -4,6 +4,55 @@ import pool from '../lib/mysql';
 import { revalidatePath } from 'next/cache';
 import fs from 'fs/promises';
 import path from 'path';
+import { Categoria, Submenu } from '../types';
+
+// Helper for consistent uploads path
+const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
+
+async function processSubmenuMedia(
+  conn: any,
+  submenuId: number | string,
+  formData: FormData
+) {
+  // 1. Process Images (Files and URLs)
+  const imageUrls = formData.getAll('imageUrls') as string[];
+  const imageFiles = formData.getAll('imageFiles');
+  const finalImageUrls: string[] = [];
+
+  imageUrls.forEach(url => {
+    if (url && url.trim()) finalImageUrls.push(url.trim());
+  });
+
+  for (const file of imageFiles) {
+    if (file instanceof File && file.size > 0) {
+      const savedPath = await salvarArquivoLocal(file);
+      if (savedPath) finalImageUrls.push(savedPath);
+    }
+  }
+
+  // 2. Process Video URLs
+  const videoUrls = formData.getAll('videoUrls') as string[];
+  const finalVideoUrls = videoUrls.filter(url => url && url.trim()).map(url => url.trim());
+
+  // 3. Process Related Submenus
+  const relatedSubmenuIds = formData.getAll('relatedSubmenuIds') as string[];
+
+  // 4. Update Database (Clear and Re-insert)
+  await conn.query('DELETE FROM submenu_images WHERE submenuId = ?', [submenuId]);
+  for (const url of finalImageUrls) {
+    await conn.query('INSERT INTO submenu_images (submenuId, url) VALUES (?, ?)', [submenuId, url]);
+  }
+
+  await conn.query('DELETE FROM submenu_videos WHERE submenuId = ?', [submenuId]);
+  for (const url of finalVideoUrls) {
+    await conn.query('INSERT INTO submenu_videos (submenuId, url) VALUES (?, ?)', [submenuId, url]);
+  }
+
+  await conn.query('DELETE FROM submenu_related WHERE submenuId = ?', [submenuId]);
+  for (const relId of relatedSubmenuIds) {
+    await conn.query('INSERT INTO submenu_related (submenuId, relatedSubmenuId) VALUES (?, ?)', [submenuId, relId]);
+  }
+}
 
 async function salvarArquivoLocal(file: File | null): Promise<string | null> {
   if (!file) {
@@ -34,14 +83,9 @@ async function salvarArquivoLocal(file: File | null): Promise<string | null> {
     const filename = `${Date.now()}-${nomeLimpo}`;
     
     // Ensure dir exists
-    const root = process.cwd();
-    console.log('[LocalUpdate] ROOT do processo:', root);
-    const uploadsDir = path.join(root, 'public', 'uploads');
+    await fs.mkdir(UPLOADS_DIR, { recursive: true });
     
-    console.log('[LocalUpdate] Verificando diretório:', uploadsDir);
-    await fs.mkdir(uploadsDir, { recursive: true });
-    
-    const filePath = path.join(uploadsDir, filename);
+    const filePath = path.join(UPLOADS_DIR, filename);
     await fs.writeFile(filePath, buffer);
     
     console.log('[LocalUpdate] Arquivo salvo com sucesso em:', filePath);
@@ -260,29 +304,19 @@ export async function criarSubmenu(formData: FormData) {
       );
       const submenuId = result.insertId;
 
-      for (const url of finalImageUrls) {
-        await conn.query('INSERT INTO submenu_images (submenuId, url) VALUES (?, ?)', [submenuId, url]);
-      }
-
-      for (const url of finalVideoUrls) {
-        await conn.query('INSERT INTO submenu_videos (submenuId, url) VALUES (?, ?)', [submenuId, url]);
-      }
-
-      for (const relId of relatedSubmenuIds) {
-        await conn.query('INSERT INTO submenu_related (submenuId, relatedSubmenuId) VALUES (?, ?)', [submenuId, relId]);
-      }
+      await processSubmenuMedia(conn, submenuId, formData);
 
       await conn.commit();
       console.log('[CriarSubmenu] Sucesso para ID:', submenuId);
-    revalidatePath('/admin');
-    revalidatePath('/');
-  } catch (error) {
-    if (conn) await conn.rollback();
-    console.error('Erro ao criar submenu:', error);
-    throw new Error('Falha ao criar submenu.');
-  } finally {
-    if (conn) conn.release();
-  }
+      revalidatePath('/admin');
+      revalidatePath('/');
+    } catch (error) {
+      if (conn) await conn.rollback();
+      console.error('Erro ao criar submenu:', error);
+      throw new Error('Falha ao criar submenu.');
+    } finally {
+      if (conn) conn.release();
+    }
 }
 
 export async function atualizarSubmenu(id: string, formData: FormData) {
@@ -293,56 +327,20 @@ export async function atualizarSubmenu(id: string, formData: FormData) {
 
   if (!conteudo) throw new Error('O conteúdo é obrigatório.');
 
-  const imageUrls = formData.getAll('imageUrls') as string[];
-  const imageFiles = formData.getAll('imageFiles');
-  
-  console.log('[AtualizarSubmenu] Recebendo para ID:', id, { imageUrls, imageFilesCount: imageFiles.length });
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
 
-  const finalImageUrls: string[] = [];
-  imageUrls.forEach(url => {
-    if (url && url.trim()) finalImageUrls.push(url.trim());
-  });
-  
-  for (const file of imageFiles) {
-    if (file instanceof File && file.size > 0) {
-      console.log('[AtualizarSubmenu] Processando arquivo:', file.name);
-      const path = await salvarArquivoLocal(file);
-      if (path) finalImageUrls.push(path);
-    }
-  }
+    await conn.query(
+      'UPDATE submenus SET nome = COALESCE(?, nome), conteudo = ?, grupo = ?, categoriaId = COALESCE(?, categoriaId) WHERE id = ?',
+      [nome, conteudo, grupo, categoriaId, id]
+    );
 
-    const videoUrls = formData.getAll('videoUrls') as string[];
-    const finalVideoUrls = videoUrls.filter(url => url && url.trim()).map(url => url.trim());
+    await processSubmenuMedia(conn, id, formData);
 
-    const relatedSubmenuIds = formData.getAll('relatedSubmenuIds') as string[];
-
-    let conn;
-    try {
-      conn = await pool.getConnection();
-      await conn.beginTransaction();
-
-      await conn.query(
-        'UPDATE submenus SET nome = COALESCE(?, nome), conteudo = ?, grupo = ?, categoriaId = COALESCE(?, categoriaId) WHERE id = ?',
-        [nome, conteudo, grupo, categoriaId, id]
-      );
-
-      await conn.query('DELETE FROM submenu_images WHERE submenuId = ?', [id]);
-      for (const url of finalImageUrls) {
-        await conn.query('INSERT INTO submenu_images (submenuId, url) VALUES (?, ?)', [id, url]);
-      }
-
-      await conn.query('DELETE FROM submenu_videos WHERE submenuId = ?', [id]);
-      for (const url of finalVideoUrls) {
-        await conn.query('INSERT INTO submenu_videos (submenuId, url) VALUES (?, ?)', [id, url]);
-      }
-
-      await conn.query('DELETE FROM submenu_related WHERE submenuId = ?', [id]);
-      for (const relId of relatedSubmenuIds) {
-        await conn.query('INSERT INTO submenu_related (submenuId, relatedSubmenuId) VALUES (?, ?)', [id, relId]);
-      }
-
-      await conn.commit();
-      console.log('[AtualizarSubmenu] Sucesso para ID:', id);
+    await conn.commit();
+    console.log('[AtualizarSubmenu] Sucesso para ID:', id);
     revalidatePath('/admin');
     revalidatePath('/');
   } catch (error) {
@@ -353,6 +351,7 @@ export async function atualizarSubmenu(id: string, formData: FormData) {
     if (conn) conn.release();
   }
 }
+
 
 export async function excluirSubmenu(id: string) {
   try {
