@@ -1,6 +1,6 @@
-# 🚀 Guia de Uso - Conhece Siclus
+# 🚀 Guia de Uso - ConheSiclus
 
-Bem-vindo ao sistema **Conhece Siclus**! Este documento serve como um guia rápido para ajudar você a gerenciar o conteúdo de forma eficiente e segura.
+Bem-vindo ao sistema **ConheSiclus**! Este documento serve como um guia rápido para ajudar você a gerenciar o conteúdo de forma eficiente e segura.
 
 ---
 
@@ -8,9 +8,8 @@ Bem-vindo ao sistema **Conhece Siclus**! Este documento serve como um guia rápi
 Para gerenciar o sistema, acesse:
 - **URL:** `http://localhost:3000/admin`
 - No painel, você encontrará três seções principais:
-    1. **Criar Categoria:** Adiciona novos ícones e menus principais.
-    2. **Gerenciar Conteúdo e Submenus:** Onde a mágica acontece (edição de texto e mídia).
-    3. **Criar Submenu:** Para adicionar novos itens a uma categoria existente.
+    1. **Gerenciar Estrutura:** Criar ou excluir categorias e submenus básicos.
+    2. **Editar Conteúdo:** Onde a mágica acontece (edição de texto, mídias e relações).
 
 ---
 
@@ -28,28 +27,30 @@ Acima do campo de **Conteúdo**, você encontrará três botões:
 ### 2. Adicionando Mídias
 Agora você pode adicionar até **5 fotos** e **2 vídeos** por item:
 - **Fotos:** Você pode fazer o upload de um arquivo do seu computador ou colar um link direto de uma imagem da internet.
-- **Vídeos:** Aceita apenas links do **YouTube** (Ex: `https://www.youtube.com/watch?v=...`). O sistema transforma automaticamente em um player de vídeo no site.
+- **Vídeos:** Aceita links do **YouTube**. O sistema gera automaticamente o player.
+
+### 3. Artigos Relacionados (Novidade)
+Na parte inferior da edição, você pode buscar por outros artigos existentes e vinculá-los. Isso criará uma seção "Veja também" no final do artigo, facilitando a navegação do usuário.
 
 ---
 
-## ✅ O que PODE fazer
-- **Renomear Categorias:** Use o botão "Renomear Categoria" na Seção 2 para corrigir erros de digitação (como transformar "Orçacameno" em "Orçamento").
-- **Organizar em Grupos:** Use o campo "Grupo" para agrupar submenus (Ex: colocar "RH" e "Financeiro" dentro de um grupo chamado "Administrativo").
-- **Trocar Ícones:** Você pode mudar o ícone de uma categoria a qualquer momento na Seção 1.
-- **Usar HTML Básico:** Se você souber um pouco de HTML, pode usar tags como `<br/>` para pular linhas ou `<i>` para itálico manualmente.
+## ✅ Funcionalidades Principais
+- **Grupos:** Organize submenus em blocos (ex: "RH" e "Financeiro" dentro de um grupo "Administrativo").
+- **Renomear Itens:** Corrija nomes de categorias ou artigos a qualquer momento.
+- **Ícones Dinâmicos:** Use nomes de ícones da biblioteca **Lucide React** (ex: `User`, `Settings`, `Mail`).
+- **Página Inicial Dinâmica:** Menu lateral auto-gerado e busca inteligente por todo o conteúdo.
 
 ---
 
-## ❌ O que NÃO PODE fazer (Para evitar erros)
-- **Não apague as tags de formatação:** Se você ver algo como `<b>` ou `<u>` no editor, não remova as "setinhas" `< >`, pois isso quebrará a formatação no site.
-- **Não use links de vídeo que não sejam do YouTube:** O sistema está otimizado especificamente para players do YouTube.
-- **Não selecione uma Categoria e um Submenu diferentes ao mesmo tempo na Seção 2:** Sempre certifique-se de que o Submenu que você está editando pertence à Categoria selecionada para evitar confusão visual.
-- **Não interrompa o processo de "Salvar":** Aguarde o alerta de "Conteúdo salvo com sucesso" antes de fechar a página ou atualizar.
+## ❌ O que EVITAR (Para evitar erros)
+- **Não apague as tags de formatação:** Tags como `<b>` ou `<u>` são essenciais para o estilo.
+- **Não interrompa o processo de "Salvar":** Aguarde o alerta de sucesso antes de sair.
+- **Links de Vídeo:** Use apenas links válidos do YouTube.
 
 ---
 
-## 🆘 Precisa de uma Categoria nova com ícone especial?
-Se precisar de um ícone que não está na lista atual, verifique os nomes disponíveis na biblioteca **Lucide React**. Se o nome do ícone (ex: `User`, `Settings`, `Mail`) for digitado exatamente igual no campo "Nome do Ícone", o sistema tentará carregá-lo automaticamente.
+## 🏠 Hospedagem e Rede
+Para saber como disponibilizar o sistema para outros computadores na mesma rede, consulte o [Guia de Hospedagem](HOSTING_GUIDE.md).
 
 ---
-*Documentação gerada em 14/03/2026.*
+*Documentação atualizada em 22/03/2026.*
