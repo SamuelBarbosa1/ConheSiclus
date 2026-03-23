@@ -18,7 +18,9 @@ async function processSubmenuMedia(
   const imageUrls = formData.getAll('imageUrls') as string[];
   const imageFiles = formData.getAll('imageFiles');
   const finalImageUrls: string[] = [];
-
+  
+  // Note: We need to maintain the order from AdminClient (imageFiles array and imageUrls array)
+  // For simplicity, we follow the logic: first all existing URLs, then all new Files.
   imageUrls.forEach(url => {
     if (url && url.trim()) finalImageUrls.push(url.trim());
   });
@@ -275,18 +277,7 @@ export async function criarSubmenu(formData: FormData) {
   
   console.log('[CriarSubmenu] Recebendo:', { imageUrls, imageFilesCount: imageFiles.length });
 
-  const finalImageUrls: string[] = [];
-  imageUrls.forEach(url => {
-    if (url && url.trim()) finalImageUrls.push(url.trim());
-  });
-  
-  for (const file of imageFiles) {
-    if (file instanceof File && file.size > 0) {
-      console.log('[CriarSubmenu] Processando arquivo:', file.name);
-      const path = await salvarArquivoLocal(file);
-      if (path) finalImageUrls.push(path);
-    }
-  }
+  // Removido processamento redundante aqui, o processSubmenuMedia já faz isso dentro da transação.
 
     const videoUrls = formData.getAll('videoUrls') as string[];
     const finalVideoUrls = videoUrls.filter(url => url && url.trim()).map(url => url.trim());

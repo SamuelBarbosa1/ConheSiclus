@@ -40,7 +40,7 @@ Se você estiver usando o usuário `root`, ele pode estar restrito. É recomend�
    ```sql
    -- Substitua 'seu_usuario' e 'sua_senha' pelos dados do seu .env
    CREATE USER 'root'@'%' IDENTIFIED BY 'sua_senha';
-   GRANT ALL PRIVILEGES ON conhece_siclus.* TO 'root'@'%';
+   GRANT ALL PRIVILEGES ON conhe_siclus.* TO 'root'@'%';
    FLUSH PRIVILEGES;
    ```
    *Nota: Se o usuário root@% já existir, use `ALTER USER`.*

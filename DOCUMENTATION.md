@@ -40,7 +40,7 @@ A informação é organizada hierarquicamente para facilitar a busca e navegaç�
 
 ## 🗄️ Estrutura do Banco de Dados (MySQL)
 
-O banco `conhece_siclus` utiliza as seguintes tabelas:
+O banco `conhe_siclus` utiliza as seguintes tabelas:
 
 1. **`categorias`**: Meta-dados dos menus principais.
    - `id`, `nome`, `icone` (string do nome do ícone Lucide).

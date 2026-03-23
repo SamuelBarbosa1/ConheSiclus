@@ -184,10 +184,21 @@ export default function AdminClient({
     fd.append('grupo', grupo.trim());
     fd.append('conteudo', conteudo);
     fd.append('categoriaId', catId);
+    
+    // Maintain the order of images: we send all items in order
+    // In actions.ts, we'll process them in this order.
     edicaoImages.forEach((img) => {
-      if (img.file) fd.append('imageFiles', img.file);
-      else if (img.url && img.url.trim()) fd.append('imageUrls', img.url.trim());
+      if (img.file) {
+        fd.append('imageFiles', img.file);
+      } else if (img.url && img.url.trim()) {
+        fd.append('imageUrls', img.url.trim());
+      } else {
+        // Enviar uma string vazia para manter o slot? 
+        // Não, a lógica atual do processSubmenuMedia reconstrói a lista.
+        // Se quisermos manter slots vazios, precisaríamos de uma lógica mais complexa.
+      }
     });
+    
     edicaoVideoUrls.forEach((url) => { if (url && url.trim()) fd.append('videoUrls', url.trim()); });
     edicaoRelatedIds.forEach((id) => { fd.append('relatedSubmenuIds', id); });
     return fd;
@@ -239,7 +250,10 @@ export default function AdminClient({
       await atualizarSubmenu(selectedSubmenuId, fd);
       showToast('Salvo com sucesso!');
       router.refresh();
-    } catch (e: any) { showToast(e.message, 'error'); }
+    } catch (e: any) {
+      console.error('[handleSalvarConteudo] Erro:', e);
+      showToast(e.message || 'Erro desconhecido ao salvar. Verifique o console ou o tamanho dos arquivos.', 'error');
+    }
     finally { setIsSubmittingConteudo(false); }
   };
 

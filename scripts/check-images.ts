@@ -15,7 +15,7 @@ async function checkImages() {
     port: parseInt(env.MYSQL_PORT || '3306'),
     user: env.MYSQL_USER || 'root',
     password: env.MYSQL_PASSWORD || '',
-    database: env.MYSQL_DATABASE || 'conhece_siclus',
+    database: env.MYSQL_DATABASE || 'conhe_siclus',
   });
 
   try {
