@@ -62,20 +62,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             const estaAberta = categoriaAberta === cat.id || isSearching;
 
             return (
-              <li key={cat.id} className="border-b border-gray-200">
+              <li key={cat.id} className="">
                 <div
                   onClick={() => toggleCategoria(cat.id)}
-                  className="flex justify-between items-center p-3 cursor-pointer hover:bg-gray-200 font-semibold text-[#0f2c4a] transition-colors"
+                  className={`flex justify-between items-center p-3 cursor-pointer hover:bg-gray-200/50 font-bold text-[#0f2c4a] transition-colors rounded-lg mx-1 ${estaAberta ? 'bg-gray-100/30' : ''}`}
                 >
                   <span className="flex items-center gap-3">
-                    <Icone size={18} className="text-[#0f2c4a]" />
+                    <Icone size={18} className={`${estaAberta ? 'text-blue-600' : 'text-[#0f2c4a]'}`} />
                     {cat.nome}
                   </span>
-                  {estaAberta ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  {estaAberta ? <ChevronUp size={18} className="text-blue-600" /> : <ChevronDown size={18} className="text-gray-400" />}
                 </div>
 
                 {estaAberta && cat.submenus && cat.submenus.length > 0 && (
-                  <ul className="pb-2 list-none bg-white">
+                  <ul className="pb-2 mt-1 list-none bg-transparent">
                     {(() => {
                       const grouped: Record<string, Submenu[]> = { soltos: [] };
                       cat.submenus.forEach((sub) => {
@@ -96,9 +96,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 setSubmenuAtivo(sub);
                                 setIsSidebarOpen(false);
                               }}
-                              className={`py-2 pl-11 pr-2 text-sm cursor-pointer transition-colors ${submenuAtivo?.id === sub.id
-                                ? 'text-blue-600 font-bold'
-                                : 'text-gray-700 hover:text-blue-600'
+                              className={`py-2 pl-11 pr-2 text-sm cursor-pointer transition-colors rounded-md mx-2 ${submenuAtivo?.id === sub.id
+                                ? 'text-blue-600 font-bold bg-blue-50/50'
+                                : 'text-gray-650 hover:text-blue-600 hover:bg-gray-100/50'
                                 }`}
                             >
                               {sub.nome}
@@ -111,14 +111,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                               <li key={grupoName}>
                                 <div
                                   onClick={() => toggleGrupo(cat.id, grupoName)}
-                                  className="flex justify-between items-center py-2 pl-11 pr-3 cursor-pointer hover:bg-gray-100 font-semibold text-[#0f2c4a] text-sm transition-colors"
+                                  className="flex justify-between items-center py-2 pl-11 pr-3 cursor-pointer hover:bg-gray-100/80 font-bold text-gray-700 text-xs uppercase tracking-tight transition-colors"
                                 >
                                   <span>{grupoName}</span>
                                   {(isGroupOpen || isSearching) ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                 </div>
 
                                 {(isGroupOpen || isSearching) && (
-                                  <ul className="pl-14 pb-1 list-none bg-white">
+                                  <ul className="pl-6 pb-1 list-none">
                                     {grouped[grupoName].map(sub => (
                                       <li
                                         key={sub.id}
@@ -126,9 +126,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                           setSubmenuAtivo(sub);
                                           setIsSidebarOpen(false);
                                         }}
-                                        className={`py-2 pr-2 text-sm cursor-pointer transition-colors ${submenuAtivo?.id === sub.id
-                                          ? 'text-blue-600 font-bold'
-                                          : 'text-gray-700 hover:text-blue-600'
+                                        className={`py-2 pl-8 pr-2 text-sm cursor-pointer transition-colors rounded-md mx-2 ${submenuAtivo?.id === sub.id
+                                          ? 'text-blue-600 font-bold bg-blue-50/50'
+                                          : 'text-gray-650 hover:text-blue-600 hover:bg-gray-100/50'
                                           }`}
                                       >
                                         {sub.nome}

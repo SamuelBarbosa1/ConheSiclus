@@ -79,9 +79,12 @@ export const MediaEditor: React.FC<MediaEditorProps> = ({
                   previewUrl = imgData.url;
                 }
                 if (!previewUrl) return null;
+                const finalSrc = (previewUrl.startsWith('http') || previewUrl.startsWith('/') || previewUrl.startsWith('blob:') || previewUrl.startsWith('data:')) 
+                  ? previewUrl 
+                  : `https://${previewUrl}`;
                 return (
                   <div className="mt-2 h-24 w-full overflow-hidden rounded border border-gray-200 bg-white flex items-center justify-center">
-                    <img src={previewUrl} className="max-w-full max-h-full object-contain" alt={`Preview ${i + 1}`} />
+                    <img src={finalSrc} className="max-w-full max-h-full object-contain" alt={`Preview ${i + 1}`} />
                   </div>
                 );
               })()}

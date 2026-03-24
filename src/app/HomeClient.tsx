@@ -143,7 +143,7 @@ export default function HomeClient({
                   {submenuAtivo.images.map((img, idx) => (
                     <div key={img.id} className="rounded-xl overflow-hidden border border-gray-100 shadow-md">
                       <img
-                        src={img.url}
+                        src={(img.url.startsWith('http') || img.url.startsWith('/')) ? img.url : `https://${img.url}`}
                         alt={`${submenuAtivo.nome} image ${idx + 1}`}
                         className="w-full h-auto object-cover max-h-[600px] hover:scale-[1.01] transition-transform duration-300"
                       />
