@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Settings, Menu, FileText } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, Menu, FileText, X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import Link from 'next/link';
 import { Categoria, Submenu } from '../types';
 import { normalizeText, sortCategorias } from '../lib/utils';
@@ -20,6 +20,16 @@ export default function HomeClient({
   const [searchTerm, setSearchTerm] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Fechar lightbox com ESC
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedImage(null);
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   const termNormalized = normalizeText(searchTerm);
 
@@ -140,15 +150,31 @@ export default function HomeClient({
 
               {submenuAtivo.images && submenuAtivo.images.length > 0 && (
                 <div className="mt-8 space-y-6">
-                  {submenuAtivo.images.map((img, idx) => (
-                    <div key={img.id} className="rounded-xl overflow-hidden border border-gray-100 shadow-md">
-                      <img
-                        src={(img.url.startsWith('http') || img.url.startsWith('/')) ? img.url : `https://${img.url}`}
-                        alt={`${submenuAtivo.nome} image ${idx + 1}`}
-                        className="w-full h-auto object-cover max-h-[600px] hover:scale-[1.01] transition-transform duration-300"
-                      />
-                    </div>
-                  ))}
+                  {submenuAtivo.images.map((img, idx) => {
+                    const finalUrl = (img.url.startsWith('http') || img.url.startsWith('/')) ? img.url : `https://${img.url}`;
+                    return (
+                      <div 
+                        key={img.id} 
+                        className="rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gray-50 group cursor-pointer relative"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          console.log('Opening image:', finalUrl);
+                          setSelectedImage(finalUrl);
+                        }}
+                      >
+                        <img
+                          src={finalUrl}
+                          alt={`${submenuAtivo.nome} image ${idx + 1}`}
+                          className="w-full h-auto object-contain max-h-[600px] transition-all duration-500 group-hover:scale-[1.05]"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                          <div className="bg-white/90 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                            <Maximize2 size={24} className="text-blue-600" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
@@ -194,6 +220,34 @@ export default function HomeClient({
           )}
         </div>
       </div>
+
+      {/* LIGHTBOX MODAL */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-10 transition-all duration-300"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+          
+          <button 
+            className="absolute top-6 right-6 p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all z-[10000]"
+            onClick={() => setSelectedImage(null)}
+          >
+            <X size={32} />
+          </button>
+
+          <div 
+            className="relative max-w-full max-h-full flex items-center justify-center z-[10000]"
+            onClick={(e) => e.stopPropagation()} 
+          >
+            <img 
+              src={selectedImage} 
+              alt="Ampliada" 
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl transition-transform duration-300 scale-100"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
