@@ -138,78 +138,119 @@ export default function HomeClient({
 
         <div className="flex-1 bg-[#f4f7f6] p-4 sm:p-10 overflow-auto w-full">
           {submenuAtivo ? (
-            <div className="max-w-4xl mx-auto bg-white p-4 sm:p-8 rounded-xl shadow-sm">
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#0f2c4a] mb-6 border-b pb-4 text-center">
-                {submenuAtivo.nome}
-              </h2>
+            <div className="max-w-[1600px] mx-auto w-full">
+              <div className="flex flex-col lg:flex-row gap-6 items-start">
+                
+                {/* CONTEÚDO PRINCIPAL (Agora no lado ESQUERDO no desktop) */}
+                <div className="flex-1 bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-50 w-full">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[#0f2c4a] mb-6 border-b pb-4 text-center">
+                    {submenuAtivo.nome}
+                  </h2>
 
-              <div
-                className="prose prose-blue max-w-none text-gray-700 leading-relaxed mb-8 text-lg"
-                dangerouslySetInnerHTML={{ __html: submenuAtivo.conteudo.replace(/\n/g, '<br/>') }}
-              />
+                  <div
+                    className="prose prose-blue max-w-none text-gray-700 leading-relaxed mb-8 text-lg"
+                    dangerouslySetInnerHTML={{ __html: submenuAtivo.conteudo.replace(/\n/g, '<br/>') }}
+                  />
 
-              {submenuAtivo.images && submenuAtivo.images.length > 0 && (
-                <div className="mt-8 space-y-6">
-                  {submenuAtivo.images.map((img, idx) => {
-                    const finalUrl = (img.url.startsWith('http') || img.url.startsWith('/')) ? img.url : `https://${img.url}`;
-                    return (
-                      <div 
-                        key={img.id} 
-                        className="rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gray-50 group cursor-pointer relative"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          console.log('Opening image:', finalUrl);
-                          setSelectedImage(finalUrl);
-                        }}
-                      >
-                        <img
-                          src={finalUrl}
-                          alt={`${submenuAtivo.nome} image ${idx + 1}`}
-                          className="w-full h-auto object-contain max-h-[600px] transition-all duration-500 group-hover:scale-[1.05]"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                          <div className="bg-white/90 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
-                            <Maximize2 size={24} className="text-blue-600" />
+                  {submenuAtivo.images && submenuAtivo.images.length > 0 && (
+                    <div className="mt-8 space-y-6">
+                      {submenuAtivo.images.map((img, idx) => {
+                        const finalUrl = (img.url.startsWith('http') || img.url.startsWith('/')) ? img.url : `https://${img.url}`;
+                        return (
+                          <div 
+                            key={img.id} 
+                            className="rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gray-50 group cursor-pointer relative"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              console.log('Opening image:', finalUrl);
+                              setSelectedImage(finalUrl);
+                            }}
+                          >
+                            <img
+                              src={finalUrl}
+                              alt={`${submenuAtivo.nome} image ${idx + 1}`}
+                              className="w-full h-auto object-contain max-h-[700px] transition-all duration-500 group-hover:scale-[1.02]"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                              <div className="bg-white/90 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                                <Maximize2 size={24} className="text-blue-600" />
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <YoutubePlayer videos={submenuAtivo.videos} submenuNome={submenuAtivo.nome} />
+
+                  {/* Assuntos Relacionados (Mobile Only - Bottom) */}
+                  {submenuAtivo.relatedSubmenus && submenuAtivo.relatedSubmenus.length > 0 && (
+                    <div className="lg:hidden mt-12 pt-8 border-t border-gray-100">
+                      <h3 className="text-xl font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
+                        <FileText size={20} className="text-blue-600" />
+                        Assuntos Relacionados
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {submenuAtivo.relatedSubmenus.map((rel) => (
+                          <div
+                            key={rel.id}
+                            onClick={() => {
+                              for (const cat of initialCategorias) {
+                                const found = cat.submenus.find(s => s.id === rel.id);
+                                if (found) {
+                                  setSubmenuAtivo(found);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                  break;
+                                }
+                              }
+                            }}
+                            className="p-4 bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 rounded-xl cursor-pointer transition-all group"
+                          >
+                            <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                              {rel.nome}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    );
-                  })}
+                    </div>
+                  )}
                 </div>
-              )}
 
-              <YoutubePlayer videos={submenuAtivo.videos} submenuNome={submenuAtivo.nome} />
-
-              {submenuAtivo.relatedSubmenus && submenuAtivo.relatedSubmenus.length > 0 && (
-                <div className="mt-12 pt-8 border-t border-gray-100">
-                  <h3 className="text-xl font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
-                    <FileText size={20} className="text-blue-600" />
-                    Assuntos Relacionados
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {submenuAtivo.relatedSubmenus.map((rel) => (
-                      <div
-                        key={rel.id}
-                        onClick={() => {
-                          for (const cat of initialCategorias) {
-                            const found = cat.submenus.find(s => s.id === rel.id);
-                            if (found) {
-                              setSubmenuAtivo(found);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              break;
-                            }
-                          }
-                        }}
-                        className="p-4 bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 rounded-xl cursor-pointer transition-all group"
-                      >
-                        <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700">
-                          {rel.nome}
-                        </span>
+                {/* LADO DIREITO: Assuntos Relacionados (Desktop) */}
+                {submenuAtivo.relatedSubmenus && submenuAtivo.relatedSubmenus.length > 0 && (
+                  <div className="hidden lg:block w-80 flex-shrink-0 sticky top-4">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                      <h3 className="text-lg font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
+                        <FileText size={18} className="text-blue-600" />
+                        Assuntos Relacionados
+                      </h3>
+                      <div className="space-y-3">
+                        {submenuAtivo.relatedSubmenus.map((rel) => (
+                          <div
+                            key={rel.id}
+                            onClick={() => {
+                              for (const cat of initialCategorias) {
+                                const found = cat.submenus.find(s => s.id === rel.id);
+                                if (found) {
+                                  setSubmenuAtivo(found);
+                                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                                  break;
+                                }
+                              }
+                            }}
+                            className="p-3 bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 rounded-lg cursor-pointer transition-all group"
+                          >
+                            <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 leading-tight block">
+                              {rel.nome}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">

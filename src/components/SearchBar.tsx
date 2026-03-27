@@ -25,7 +25,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
         <input
           type="text"
-          placeholder="Pesquisar..."
+          placeholder="Como podemos ajudá-lo?"
           className="w-full pl-11 pr-10 py-2.5 bg-gray-100 border-transparent border focus:border-blue-200 focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-sm font-medium"
           value={searchTerm}
           onChange={(e) => {
