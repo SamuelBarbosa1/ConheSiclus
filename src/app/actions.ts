@@ -4,7 +4,34 @@ import pool from '../lib/mysql';
 import { revalidatePath } from 'next/cache';
 import fs from 'fs/promises';
 import path from 'path';
+import { cookies } from 'next/headers';
+import crypto from 'crypto';
 import { Categoria, Submenu } from '../types';
+
+const SESSION_COOKIE = 'siclus_session';
+const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback_secret';
+
+function hashPassword(password: string) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+function signSession(data: any) {
+  const str = JSON.stringify(data);
+  const hmac = crypto.createHmac('sha256', SESSION_SECRET).update(str).digest('hex');
+  return `${Buffer.from(str).toString('base64')}.${hmac}`;
+}
+
+function verifySession(token: string) {
+  try {
+    const [payloadBase64, signature] = token.split('.');
+    const payload = Buffer.from(payloadBase64, 'base64').toString();
+    const expectedHmac = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+    if (signature === expectedHmac) {
+      return JSON.parse(payload);
+    }
+  } catch (e) {}
+  return null;
+}
 
 // Helper for consistent uploads path
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
@@ -272,42 +299,30 @@ export async function criarSubmenu(formData: FormData) {
     throw new Error('Todos os campos obrigatórios devem ser preenchidos.');
   }
 
-  const imageUrls = formData.getAll('imageUrls') as string[];
-  const imageFiles = formData.getAll('imageFiles');
-  
-  console.log('[CriarSubmenu] Recebendo:', { imageUrls, imageFilesCount: imageFiles.length });
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    await conn.beginTransaction();
 
-  // Removido processamento redundante aqui, o processSubmenuMedia já faz isso dentro da transação.
+    const [result]: any = await conn.query(
+      'INSERT INTO submenus (nome, conteudo, grupo, categoriaId) VALUES (?, ?, ?, ?)',
+      [nome, conteudo, grupo, categoriaId]
+    );
+    const submenuId = result.insertId;
 
-    const videoUrls = formData.getAll('videoUrls') as string[];
-    const finalVideoUrls = videoUrls.filter(url => url && url.trim()).map(url => url.trim());
+    await processSubmenuMedia(conn, submenuId, formData);
 
-    const relatedSubmenuIds = formData.getAll('relatedSubmenuIds') as string[];
-
-    let conn;
-    try {
-      conn = await pool.getConnection();
-      await conn.beginTransaction();
-
-      const [result]: any = await conn.query(
-        'INSERT INTO submenus (nome, conteudo, grupo, categoriaId) VALUES (?, ?, ?, ?)',
-        [nome, conteudo, grupo, categoriaId]
-      );
-      const submenuId = result.insertId;
-
-      await processSubmenuMedia(conn, submenuId, formData);
-
-      await conn.commit();
-      console.log('[CriarSubmenu] Sucesso para ID:', submenuId);
-      revalidatePath('/admin');
-      revalidatePath('/');
-    } catch (error) {
-      if (conn) await conn.rollback();
-      console.error('Erro ao criar submenu:', error);
-      throw new Error('Falha ao criar submenu.');
-    } finally {
-      if (conn) conn.release();
-    }
+    await conn.commit();
+    revalidatePath('/admin');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    if (conn) await conn.rollback();
+    console.error('Erro ao criar submenu:', error);
+    throw new Error('Falha ao criar submenu.');
+  } finally {
+    if (conn) conn.release();
+  }
 }
 
 export async function atualizarSubmenu(id: string, formData: FormData) {
@@ -331,7 +346,6 @@ export async function atualizarSubmenu(id: string, formData: FormData) {
     await processSubmenuMedia(conn, id, formData);
 
     await conn.commit();
-    console.log('[AtualizarSubmenu] Sucesso para ID:', id);
     revalidatePath('/admin');
     revalidatePath('/');
   } catch (error) {
@@ -343,7 +357,6 @@ export async function atualizarSubmenu(id: string, formData: FormData) {
   }
 }
 
-
 export async function excluirSubmenu(id: string) {
   try {
     await pool.query('DELETE FROM submenus WHERE id = ?', [id]);
@@ -353,4 +366,62 @@ export async function excluirSubmenu(id: string) {
     console.error('Erro ao excluir submenu:', error);
     throw new Error('Falha ao excluir submenu.');
   }
+}
+
+/* ============================
+   AUTH - SERVER ACTIONS
+   ============================ */
+
+export async function login(formData: FormData) {
+  const email = formData.get('email') as string;
+  const senha = formData.get('senha') as string;
+
+  if (!email || !senha) throw new Error('Email e senha são obrigatórios.');
+
+  const [rows]: any = await pool.query('SELECT * FROM usuarios WHERE email = ?', [email]);
+  if (rows.length === 0) throw new Error('Usuário não encontrado.');
+
+  const user = rows[0];
+  const hashed = hashPassword(senha);
+
+  if (user.senha !== hashed) {
+    throw new Error('Senha incorreta.');
+  }
+
+  const sessionData = {
+    userId: user.id,
+    email: user.email,
+    nome: user.nome,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7 // 7 days
+  };
+
+  const token = signSession(sessionData);
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7
+  });
+
+  return { success: true };
+}
+
+export async function logout() {
+  const cookieStore = await cookies();
+  cookieStore.delete(SESSION_COOKIE);
+  revalidatePath('/admin');
+}
+
+export async function checkAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+
+  const session = verifySession(token);
+  if (!session || session.expires < Date.now()) {
+    return null;
+  }
+  return session;
 }

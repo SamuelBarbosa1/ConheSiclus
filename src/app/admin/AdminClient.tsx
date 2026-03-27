@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   criarCategoria,
+  excluirCategoria,
+  atualizarCategoria,
   criarSubmenu,
   atualizarSubmenu,
-  excluirCategoria,
   excluirSubmenu,
-  atualizarCategoria,
+  logout,
 } from '../actions';
 import { useRouter } from 'next/navigation';
 import { Categoria, Submenu } from '../../types';
@@ -15,7 +16,7 @@ import { normalizeString, sortCategorias } from '../../lib/utils';
 import { MediaEditor } from '../../components/MediaEditor';
 import { RelatedArticlesEditor } from '../../components/RelatedArticlesEditor';
 import { Toast, ToastType } from '../../components/Toast';
-import { Loader2, Plus, Save, Trash2, Edit3, X, AlertTriangle, Settings } from 'lucide-react';
+import { Loader2, Plus, Save, Trash2, Edit3, X, AlertTriangle, Settings, LogOut } from 'lucide-react';
 
 // Single Modal Component for all dialogues
 interface ModalProps {
@@ -141,6 +142,11 @@ export default function AdminClient({
   const [novoSubmenuNome, setNovoSubmenuNome] = useState('');
   const [novoGrupo, setNovoGrupo] = useState('');
   const [isSubmittingEstrutura, setIsSubmittingEstrutura] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/admin/login');
+  };
 
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<string>('');
   const [selectedSubmenuId, setSelectedSubmenuId] = useState<string>('');
@@ -379,9 +385,18 @@ export default function AdminClient({
 
       {/* SEÇÃO 1: ESTRUTURA */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
-        <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
-          <Plus size={18} className="text-teal-600" />
-          <h2 className="font-bold text-gray-700">1. Gerenciar Estrutura</h2>
+        <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Plus size={18} className="text-teal-600" />
+            <h2 className="font-bold text-gray-700">1. Gerenciar Estrutura</h2>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all"
+          >
+            <LogOut size={14} />
+            Sair do Painel
+          </button>
         </div>
 
         <div className="p-6">
