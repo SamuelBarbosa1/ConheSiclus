@@ -52,6 +52,8 @@ O banco `conhe_siclus` utiliza as seguintes tabelas:
    - `id`, `submenuId` (FK), `url`.
 5. **`submenu_related`**: Tabela de junção para artigos relacionados.
    - `submenuId` (FK), `relatedSubmenuId` (FK).
+6. **`usuarios`**: Tabela de usuários para acesso ao painel.
+   - `id`, `nome`, `email` (UNIQUE), `senha` (SHA-256 hash).
 
 ---
 *Documentação atualizada em março de 2026 (Refletindo Next.js 16 e MySQL Local).*

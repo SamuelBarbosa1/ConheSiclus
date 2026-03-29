@@ -1,36 +1,48 @@
 # Guia de Administradores - ConheSiclus
 
-Este documento explica como cadastrar e gerenciar pessoas com acesso ao painel administrativo.
+Este documento explica como gerenciar pessoas com acesso ao painel administrativo e as configurações necessárias para o funcionamento do sistema.
 
-## Como cadastrar um novo administrador
+## Gerenciamento de Usuários via Script
 
-Para cadastrar um novo usuário com acesso ao painel, você deve executar o script de criação no terminal.
+Atualmente, o gerenciamento de contas administrativas é feito através de scripts executados no servidor.
 
-### Passo 1: Abrir o terminal
-Abra o terminal (PowerShell ou Command Prompt) na pasta raiz do projeto (`C:\Users\sboliveira\Desktop\ConheSiclus`).
-
-### Passo 2: Executar o comando
-Execute o seguinte comando substituindo os dados conforme necessário:
-
+### 1. Como cadastrar um novo administrador
+Para cadastrar um novo usuário:
 ```bash
-node scripts/create-admin.mjs "Nome do Usuario" "email@dominio.com.br" "senha123"
+node scripts/create-admin.mjs "Nome do Usuário" "email@dominio.com.br" "senha123"
 ```
 
-**Exemplo:**
+### 2. Como excluir um administrador
+Para remover o acesso de um usuário:
 ```bash
-node scripts/create-admin.mjs "Joao Silva" "joao.silva@ensti.com.br" "admin456"
+node scripts/delete-admin.mjs "email@dominio.com.br"
 ```
 
-### Passo 3: Confirmar sucesso
-Se o comando for bem sucedido, você verá a mensagem:
-`✅ Admin user created successfully!`
+### 3. Como atualizar a senha de um administrador
+Caso um usuário esqueça a senha ou precise trocá-la:
+```bash
+node scripts/update-password.mjs "email@dominio.com.br" "nova_senha456"
+```
 
-Agora o novo usuário já pode acessar o site em `/admin` e fazer login com o e-mail e senha cadastrados.
+---
+
+## Configuração de Email (SMTP)
+
+Para que as funcionalidades de recuperação de senha e notificações funcionem, é necessário configurar as variáveis de SMTP no arquivo `.env`:
+
+```env
+SMTP_HOST=smtp.exemplo.com
+SMTP_PORT=587
+SMTP_USER=seu-usuario@exemplo.com
+SMTP_PASS=sua-senha
+SMTP_FROM="ConheSiclus <noreply@exemplo.com>"
+```
 
 ---
 
 ## Observações Importantes
 
-- **Segurança**: Guarde as senhas em local seguro. Por enquanto, as senhas só podem ser alteradas ou cadastradas via scripts por desenvolvedores.
-- **E-mail Único**: Não é possível cadastrar dois usuários com o mesmo e-mail.
-- **Script de Criação**: O script `scripts/create-admin.mjs` utiliza o banco de dados configurado no arquivo `.env`. Certifique-se de que o banco MySQL está rodando.
+- **Segurança**: As senhas são armazenadas com hash SHA-256. Nunca compartilhe suas credenciais.
+- **Banco de Dados**: Certifique-se de que as credenciais do MySQL no `.env` estão corretas antes de executar os scripts.
+- **Interface**: O painel administrativo pode ser acessado em `/admin` após realizar o login.
+- **Mídia**: O sistema suporta upload de imagens locais e links externos (YouTube/Vimeo) para os artigos.

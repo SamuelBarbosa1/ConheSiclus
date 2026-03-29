@@ -24,7 +24,7 @@ async function createAdmin() {
 
   try {
     console.log(`Creating admin user: ${nome} (${email})...`);
-    
+
     // Check if user already exists
     const [existing] = await pool.query('SELECT id FROM usuarios WHERE email = ?', [email]);
     if (existing.length > 0) {
@@ -34,19 +34,21 @@ async function createAdmin() {
 
     const hashed = hashPassword(senha);
     await pool.query('INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)', [nome, email, hashed]);
-    
-    console.log('\n✅ Admin user created successfully!');
+
+    console.log('\n✅ Usuário administrador criado com sucesso!');
     console.log('-------------------------------');
     console.log(`Email: ${email}`);
     console.log(`Senha: ${senha}`);
     console.log('-------------------------------');
-    console.log('IMPORTANT: Keep these credentials safe.');
-    
+    console.log('IMPORTANTE: Guarde essas credenciais com segurança.');
+
     process.exit(0);
   } catch (error) {
-    console.error('Failed to create admin:', error);
+    console.error('❌ Falha ao criar usuário administrador:', error.message);
     process.exit(1);
   }
 }
 
 createAdmin();
+
+

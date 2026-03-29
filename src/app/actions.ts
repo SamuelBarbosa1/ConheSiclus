@@ -8,6 +8,7 @@ import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { Categoria, Submenu } from '../types';
 
+
 const SESSION_COOKIE = 'siclus_session';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback_secret';
 
@@ -425,3 +426,4 @@ export async function checkAuth() {
   }
   return session;
 }
+
