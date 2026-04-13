@@ -78,7 +78,7 @@ async function processSubmenuMedia(
     await conn.query('INSERT INTO submenu_videos (submenuId, url) VALUES (?, ?)', [submenuId, url]);
   }
 
-  await conn.query('DELETE FROM submenu_related WHERE submenuId = ?', [submenuId]);
+  await conn.query('DELETE FROM submenu_related WHERE submenuId = ? OR relatedSubmenuId = ?', [submenuId, submenuId]);
   for (const relId of relatedSubmenuIds) {
     await conn.query('INSERT INTO submenu_related (submenuId, relatedSubmenuId) VALUES (?, ?)', [submenuId, relId]);
   }
@@ -165,10 +165,11 @@ export async function getMenuCompleto() {
             .filter((vid: any) => vid.submenuId === s.id)
             .map((vid: any) => ({ url: vid.url, id: vid.id.toString() })),
           relatedSubmenus: related
-            .filter((rel: any) => rel.submenuId === s.id)
+            .filter((rel: any) => rel.submenuId === s.id || rel.relatedSubmenuId === s.id)
             .map((rel: any) => {
-              const rSub = submenus.find((sub: any) => sub.id === rel.relatedSubmenuId);
-              return { id: rel.relatedSubmenuId.toString(), nome: rSub?.nome || 'Desconhecido' };
+              const otherId = rel.submenuId === s.id ? rel.relatedSubmenuId : rel.submenuId;
+              const rSub = submenus.find((sub: any) => sub.id === otherId);
+              return { id: otherId.toString(), nome: rSub?.nome || 'Desconhecido' };
             })
         }));
         
@@ -272,9 +273,9 @@ export async function getSubmenuById(id: string) {
     const [relatedRows]: any = await pool.query(`
       SELECT s.id, s.nome 
       FROM submenus s
-      JOIN submenu_related sr ON s.id = sr.relatedSubmenuId
-      WHERE sr.submenuId = ?
-    `, [id]);
+      JOIN submenu_related sr ON (s.id = sr.relatedSubmenuId AND sr.submenuId = ?) 
+                              OR (s.id = sr.submenuId AND sr.relatedSubmenuId = ?)
+    `, [id, id]);
 
     return {
       ...submenu,
@@ -374,39 +375,48 @@ export async function excluirSubmenu(id: string) {
    ============================ */
 
 export async function login(formData: FormData) {
-  const email = formData.get('email') as string;
-  const senha = formData.get('senha') as string;
+  try {
+    const email = formData.get('email') as string;
+    const senha = formData.get('senha') as string;
 
-  if (!email || !senha) throw new Error('Email e senha são obrigatórios.');
+    if (!email || !senha) {
+      return { success: false, message: 'Email e senha são obrigatórios.' };
+    }
 
-  const [rows]: any = await pool.query('SELECT * FROM usuarios WHERE email = ?', [email]);
-  if (rows.length === 0) throw new Error('Usuário não encontrado.');
+    const [rows]: any = await pool.query('SELECT * FROM usuarios WHERE email = ?', [email]);
+    if (rows.length === 0) {
+      return { success: false, message: 'Senha ou email incorretos.' };
+    }
 
-  const user = rows[0];
-  const hashed = hashPassword(senha);
+    const user = rows[0];
+    const hashed = hashPassword(senha);
 
-  if (user.senha !== hashed) {
-    throw new Error('Senha incorreta.');
+    if (user.senha !== hashed) {
+      return { success: false, message: 'Senha ou email incorretos.' };
+    }
+
+    const sessionData = {
+      userId: user.id,
+      email: user.email,
+      nome: user.nome,
+      expires: Date.now() + 1000 * 60 * 60 * 24 * 7 // 7 days
+    };
+
+    const token = signSession(sessionData);
+    const cookieStore = await cookies();
+    cookieStore.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error('Erro no processamento do login:', error);
+    return { success: false, message: 'Erro no servidor ao processar o login.' };
   }
-
-  const sessionData = {
-    userId: user.id,
-    email: user.email,
-    nome: user.nome,
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7 // 7 days
-  };
-
-  const token = signSession(sessionData);
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7
-  });
-
-  return { success: true };
 }
 
 export async function logout() {

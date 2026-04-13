@@ -15,7 +15,7 @@ export const YoutubePlayer: React.FC<YoutubePlayerProps> = ({ videos, submenuNom
       {videos.map((vid) => {
         const embedUrl = getYoutubeEmbedUrl(vid.url);
         return (
-          <div key={vid.id} className="aspect-video rounded-xl overflow-hidden border border-gray-100 shadow-md relative group">
+          <div key={vid.id} className="max-w-4xl mx-auto w-full aspect-video rounded-xl overflow-hidden border border-gray-100 shadow-md relative group">
             <iframe
               className="absolute top-0 left-0 w-full h-full"
               src={embedUrl}

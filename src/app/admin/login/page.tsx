@@ -26,9 +26,12 @@ export default function LoginPage() {
       if (result.success) {
         router.push('/admin');
         router.refresh();
+      } else {
+        setError(result.message || 'Falha ao realizar login');
       }
     } catch (err: any) {
-      setError(err.message || 'Falha ao realizar login');
+      console.error('Erro ao chamar a server action de login:', err);
+      setError('Ocorreu um erro inesperado ao processar o login.');
     } finally {
       setLoading(false);
     }

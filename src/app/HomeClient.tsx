@@ -113,7 +113,7 @@ export default function HomeClient({
         {/* Configurações */}
         <div className="flex items-center gap-4">
           <Link
-            href="/admin"
+            href="/configuracoes"
             className="flex items-center gap-2 text-sm text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl transition-all border border-blue-100 shadow-sm"
           >
             <Settings size={16} />
@@ -159,7 +159,7 @@ export default function HomeClient({
                         return (
                           <div 
                             key={img.id} 
-                            className="rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gray-50 group cursor-pointer relative"
+                            className="max-w-3xl mx-auto w-full rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gray-50 group cursor-pointer relative"
                             onClick={(e) => {
                               e.preventDefault();
                               console.log('Opening image:', finalUrl);
@@ -169,7 +169,7 @@ export default function HomeClient({
                             <img
                               src={finalUrl}
                               alt={`${submenuAtivo.nome} image ${idx + 1}`}
-                              className="w-full h-auto object-contain max-h-[700px] transition-all duration-500 group-hover:scale-[1.02]"
+                              className="w-full h-auto object-contain max-h-[500px] transition-all duration-500 group-hover:scale-[1.02]"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
                               <div className="bg-white/90 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
