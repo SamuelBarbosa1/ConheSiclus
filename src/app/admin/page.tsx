@@ -1,6 +1,7 @@
-import { getCategorias, getSubmenus } from '../actions';
+import { getCategorias, getSubmenus, checkAuth } from '../actions';
 import AdminClient from './AdminClient';
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: "ConheSiclusAdmin",
@@ -10,6 +11,11 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export default async function AdminPage() {
+  const session = await checkAuth();
+  if (!session) {
+    redirect('/admin/login');
+  }
+
   const categorias = await getCategorias();
   const submenus = await getSubmenus(); // Buscar todos os submenus inicialmente
 

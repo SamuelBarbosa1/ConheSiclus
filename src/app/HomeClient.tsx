@@ -96,7 +96,18 @@ export default function HomeClient({
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-2 sm:gap-3">
-            <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-12 w-auto object-contain" />
+            <button
+              onClick={() => {
+                setSubmenuAtivo(null);
+                setCategoriaAberta(null);
+                setSearchTerm('');
+                setIsSidebarOpen(false);
+              }}
+              className="cursor-pointer hover:opacity-80 transition-all active:scale-95"
+              title="Início"
+            >
+              <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-12 w-auto object-contain" />
+            </button>
             <div className="h-10 w-[2px] bg-gray-200 mx-1"></div>
             <span className="text-[#0f2c4a] font-black text-xl sm:text-2xl tracking-tighter">ConheSiclus</span>
           </div>

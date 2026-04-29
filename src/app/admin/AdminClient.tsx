@@ -11,6 +11,7 @@ import {
   logout,
 } from '../actions';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Categoria, Submenu } from '../../types';
 import { normalizeString, sortCategorias } from '../../lib/utils';
 import { MediaEditor } from '../../components/MediaEditor';
@@ -190,7 +191,7 @@ export default function AdminClient({
     fd.append('grupo', grupo.trim());
     fd.append('conteudo', conteudo);
     fd.append('categoriaId', catId);
-    
+
     // Maintain the order of images: we send all items in order
     // In actions.ts, we'll process them in this order.
     edicaoImages.forEach((img) => {
@@ -204,7 +205,7 @@ export default function AdminClient({
         // Se quisermos manter slots vazios, precisaríamos de uma lógica mais complexa.
       }
     });
-    
+
     edicaoVideoUrls.forEach((url) => { if (url && url.trim()) fd.append('videoUrls', url.trim()); });
     edicaoRelatedIds.forEach((id) => { fd.append('relatedSubmenuIds', id); });
     return fd;
@@ -386,11 +387,20 @@ export default function AdminClient({
       {/* SEÇÃO 1: ESTRUTURA */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
         <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Plus size={18} className="text-teal-600" />
-            <h2 className="font-bold text-gray-700">1. Gerenciar Estrutura</h2>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Link href="/" className="hover:opacity-80 transition-all active:scale-95" title="Voltar ao Início">
+                <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-8 w-auto object-contain" />
+              </Link>
+              <div className="h-6 w-[1px] bg-gray-300 mx-1"></div>
+              <span className="text-[#0f2c4a] font-black text-lg tracking-tighter">ConheSiclus</span>
+            </div>
+            <div className="flex items-center gap-2 border-l pl-4 border-gray-200 ml-2">
+              <Plus size={18} className="text-teal-600" />
+              <h2 className="font-bold text-gray-700">Painel Administrativo</h2>
+            </div>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all"
           >
@@ -587,3 +597,4 @@ export default function AdminClient({
     </div>
   );
 }
+

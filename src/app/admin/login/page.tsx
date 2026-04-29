@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { login } from '../../actions';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, Loader2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -47,11 +48,13 @@ export default function LoginPage() {
           {/* Header/Logo */}
           <div className="pt-12 pb-8 px-8 text-center flex flex-col items-center">
             <div className="bg-gray-50 p-4 rounded-2xl mb-6 shadow-inner">
-               <img 
-                src="/ensti-logo.jpg" 
-                alt="ENSTI/Siclus" 
-                className="h-16 w-auto object-contain"
-              />
+              <Link href="/" className="hover:opacity-80 transition-opacity">
+                <img 
+                  src="/ensti-logo.jpg" 
+                  alt="ENSTI/Siclus" 
+                  className="h-16 w-auto object-contain"
+                />
+              </Link>
             </div>
             
             <h1 className="text-2xl font-black text-[#0f2c4a] tracking-tight">

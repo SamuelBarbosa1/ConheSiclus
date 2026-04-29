@@ -406,7 +406,7 @@ export async function login(formData: FormData) {
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Permitir login via HTTP para acesso por IP na rede local
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7
