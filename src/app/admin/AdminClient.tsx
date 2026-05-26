@@ -389,7 +389,7 @@ export default function AdminClient({
         <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Link href="/" className="hover:opacity-80 transition-all active:scale-95" title="Voltar ao Início">
+              <Link href="/" className="hover:scale-105 active:scale-95 transition-transform duration-200" title="Voltar ao menu inicial">
                 <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-8 w-auto object-contain" />
               </Link>
               <div className="h-6 w-[1px] bg-gray-300 mx-1"></div>

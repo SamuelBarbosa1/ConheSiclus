@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Submenu } from '../types';
 
@@ -19,8 +19,58 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   allMatchingSubmenus,
   onResultClick,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [setIsDropdownOpen]);
+
+  const highlightText = (text: string, highlight: string) => {
+    if (!highlight.trim()) return <span>{text}</span>;
+
+    const normalize = (str: string) =>
+      str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+    const normalizedText = normalize(text);
+    const normalizedHighlight = normalize(highlight);
+
+    const parts: React.ReactNode[] = [];
+    let currentIndex = 0;
+
+    while (true) {
+      const matchIndex = normalizedText.indexOf(normalizedHighlight, currentIndex);
+      if (matchIndex === -1) {
+        parts.push(text.substring(currentIndex));
+        break;
+      }
+
+      if (matchIndex > currentIndex) {
+        parts.push(text.substring(currentIndex, matchIndex));
+      }
+
+      const matchText = text.substring(matchIndex, matchIndex + highlight.length);
+      parts.push(
+        <mark key={matchIndex} className="bg-yellow-100 text-blue-900 rounded-[2px] px-0.5 font-bold">
+          {matchText}
+        </mark>
+      );
+
+      currentIndex = matchIndex + highlight.length;
+    }
+
+    return <span>{parts}</span>;
+  };
+
   return (
-    <div className="flex-1 max-w-xl mx-2 sm:mx-12">
+    <div ref={containerRef} className="flex-1 max-w-xl mx-2 sm:mx-12">
       <div className="relative group">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
         <input
@@ -60,9 +110,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-700">{sub.nome}</p>
+                      <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-700">{highlightText(sub.nome, searchTerm)}</p>
                       <p className="text-[11px] text-gray-500 mt-0.5">
-                        {sub.categoriaNome} {sub.grupo ? `• ${sub.grupo}` : ''}
+                        {sub.categoriaNome} {sub.grupo ? <>• {highlightText(sub.grupo, searchTerm)}</> : ''}
                       </p>
                     </div>
                     <Search size={14} className="text-gray-300 group-hover:text-blue-400 mt-1" />

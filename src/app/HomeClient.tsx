@@ -103,8 +103,8 @@ export default function HomeClient({
                 setSearchTerm('');
                 setIsSidebarOpen(false);
               }}
-              className="cursor-pointer hover:opacity-80 transition-all active:scale-95"
-              title="Início"
+              className="cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
+              title="Voltar ao menu inicial"
             >
               <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-12 w-auto object-contain" />
             </button>
@@ -149,7 +149,7 @@ export default function HomeClient({
 
         <div className="flex-1 bg-[#f4f7f6] p-4 sm:p-10 overflow-auto w-full">
           {submenuAtivo ? (
-            <div className="max-w-[1600px] mx-auto w-full">
+            <div key={submenuAtivo.id} className="max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex flex-col lg:flex-row gap-6 items-start">
                 
                 {/* CONTEÚDO PRINCIPAL (Agora no lado ESQUERDO no desktop) */}
