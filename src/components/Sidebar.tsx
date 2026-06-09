@@ -42,8 +42,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className={`
         fixed lg:static inset-y-0 left-0 z-40
         ${isSidebarOpen ? 'w-[300px] translate-x-0' : 'w-0 lg:w-0 -translate-x-full lg:translate-x-0 overflow-hidden'}
-        h-full bg-[#f8fafc] overflow-y-auto border-r border-gray-100 transition-all duration-300 ease-in-out
+        h-full bg-[#f8fafc] overflow-y-auto custom-sidebar-scrollbar border-r border-gray-100 transition-all duration-300 ease-in-out
       `}>
+        <style dangerouslySetInnerHTML={{ __html: `
+          .custom-sidebar-scrollbar::-webkit-scrollbar {
+            width: 5px;
+          }
+          .custom-sidebar-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #e2e8f0;
+            border-radius: 10px;
+          }
+          .custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #cbd5e1;
+          }
+        `}} />
         <div className="p-4 bg-white/50 border-b border-gray-100">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-2">Navegação</h3>
         </div>
@@ -96,9 +111,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 setSubmenuAtivo(sub);
                                 setIsSidebarOpen(false);
                               }}
-                              className={`py-2 pl-11 pr-2 text-sm cursor-pointer transition-colors rounded-md mx-2 ${submenuAtivo?.id === sub.id
-                                ? 'text-blue-600 font-bold bg-blue-50/50'
-                                : 'text-gray-650 hover:text-blue-600 hover:bg-gray-100/50'
+                              className={`py-2 pl-11 pr-2 text-sm cursor-pointer transition-all rounded-r-lg mx-2 border-l-2 ${submenuAtivo?.id === sub.id
+                                ? 'text-blue-700 font-bold bg-blue-50/70 border-blue-600'
+                                : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100/50 border-transparent'
                                 }`}
                             >
                               {sub.nome}
@@ -126,9 +141,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                           setSubmenuAtivo(sub);
                                           setIsSidebarOpen(false);
                                         }}
-                                        className={`py-2 pl-8 pr-2 text-sm cursor-pointer transition-colors rounded-md mx-2 ${submenuAtivo?.id === sub.id
-                                          ? 'text-blue-600 font-bold bg-blue-50/50'
-                                          : 'text-gray-650 hover:text-blue-600 hover:bg-gray-100/50'
+                                        className={`py-2 pl-8 pr-2 text-sm cursor-pointer transition-all rounded-r-lg mx-2 border-l-2 ${submenuAtivo?.id === sub.id
+                                          ? 'text-blue-700 font-bold bg-blue-50/70 border-blue-600'
+                                          : 'text-gray-655 hover:text-blue-600 hover:bg-gray-100/50 border-transparent'
                                           }`}
                                       >
                                         {sub.nome}

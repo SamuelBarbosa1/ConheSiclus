@@ -8,6 +8,7 @@ import { normalizeText, sortCategorias } from '../lib/utils';
 import { SearchBar } from '../components/SearchBar';
 import { Sidebar } from '../components/Sidebar';
 import { YoutubePlayer } from '../components/YoutubePlayer';
+import { iconMap } from '../lib/constants';
 
 export default function HomeClient({
   initialCategorias,
@@ -86,7 +87,7 @@ export default function HomeClient({
 
   return (
     <div className="flex flex-col h-screen w-full font-sans bg-white text-gray-900 overflow-hidden">
-      <header className="h-20 flex-shrink-0 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 z-30 shadow-sm relative">
+      <header className="h-20 flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-gray-100/80 flex items-center justify-between px-4 sm:px-8 z-30 shadow-sm sticky top-0">
         <div className="flex items-center gap-2 sm:gap-5">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -154,7 +155,49 @@ export default function HomeClient({
                 
                 {/* CONTEÚDO PRINCIPAL (Agora no lado ESQUERDO no desktop) */}
                 <div className="flex-1 bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-50 w-full">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-[#0f2c4a] mb-6 border-b pb-4 text-center">
+                  {/* BREADCRUMBS & META TAGS */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      <button
+                        onClick={() => {
+                          setSubmenuAtivo(null);
+                          setSearchTerm('');
+                        }}
+                        className="hover:text-blue-600 transition-colors"
+                      >
+                        Início
+                      </button>
+                      <span>/</span>
+                      <span className="text-gray-600">
+                        {(() => {
+                          const cat = initialCategorias.find((c) => c.id === submenuAtivo.categoriaId);
+                          return cat ? cat.nome : '';
+                        })()}
+                      </span>
+                      {submenuAtivo.grupo && (
+                        <>
+                          <span>/</span>
+                          <span className="text-gray-600">{submenuAtivo.grupo}</span>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">
+                        {(() => {
+                          const cat = initialCategorias.find((c) => c.id === submenuAtivo.categoriaId);
+                          return cat ? cat.nome : '';
+                        })()}
+                      </span>
+                      {submenuAtivo.grupo && (
+                        <span className="px-2.5 py-1 bg-gray-100 text-gray-650 rounded-full text-xs font-bold">
+                          {submenuAtivo.grupo}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2c4a] mb-6 text-center">
                     {submenuAtivo.nome}
                   </h2>
 
@@ -264,10 +307,86 @@ export default function HomeClient({
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-              <FileText size={48} className="mb-4 opacity-50" />
-              <h1 className="text-2xl font-medium text-gray-500">Bem-vindo ao ConheSiclus</h1>
-              <p className="mt-2 text-gray-400">Selecione um item no menu lateral para visualizar!</p>
+            <div className="max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+              {/* HERO SECTION */}
+              <div className="bg-gradient-to-br from-[#0f2c4a] via-[#1a3d60] to-[#0a1e33] rounded-3xl p-8 sm:p-12 text-white shadow-lg relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent)]"></div>
+                <div className="relative z-10 max-w-2xl">
+                  <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                    Base de Conhecimento
+                  </span>
+                  <h1 className="text-3xl sm:text-5xl font-black tracking-tight mt-4 mb-2 bg-gradient-to-r from-white via-blue-50 to-blue-200 bg-clip-text text-transparent">
+                    Bem-vindo ao ConheSiclus
+                  </h1>
+                  <p className="text-blue-100/80 text-lg font-medium leading-relaxed">
+                    Pesquise acima ou navegue pelas categorias abaixo para acessar tutoriais, manuais e documentações do sistema Siclus.
+                  </p>
+                </div>
+              </div>
+
+              {/* CATEGORIES GRID */}
+              <div>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">
+                  Navegar por Categorias
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {initialCategorias.sort(sortCategorias).map((cat) => {
+                    const Icone = iconMap[cat.icone || ''] || iconMap[cat.nome] || iconMap.default;
+                    return (
+                      <div
+                        key={cat.id}
+                        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+                        onClick={() => {
+                          toggleCategoria(cat.id);
+                          setIsSidebarOpen(true);
+                        }}
+                      >
+                        <div>
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-[#0f2c4a] group-hover:text-white transition-colors duration-300">
+                              <Icone size={22} />
+                            </div>
+                            <div>
+                              <h4 className="text-lg font-bold text-[#0f2c4a] group-hover:text-blue-700 transition-colors">
+                                {cat.nome}
+                              </h4>
+                              <p className="text-xs text-gray-400 font-medium">
+                                {cat.submenus.length} {cat.submenus.length === 1 ? 'tópico' : 'tópicos'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {cat.submenus && cat.submenus.length > 0 && (
+                            <ul className="space-y-2.5 mt-2">
+                              {cat.submenus.slice(0, 3).map((sub) => (
+                                <li
+                                  key={sub.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSubmenuAtivo(sub);
+                                    setIsSidebarOpen(false);
+                                  }}
+                                  className="text-sm font-medium text-gray-650 hover:text-blue-600 flex items-center gap-2 transition-colors pl-1"
+                                >
+                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-blue-400 transition-colors"></span>
+                                  <span className="truncate">{sub.nome}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+
+                        {cat.submenus.length > 3 && (
+                          <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                            <span>Ver mais {cat.submenus.length - 3} tópicos</span>
+                            <ChevronRight size={14} className="transform group-hover:translate-x-1 transition-transform" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -17,7 +17,7 @@ import { normalizeString, sortCategorias } from '../../lib/utils';
 import { MediaEditor } from '../../components/MediaEditor';
 import { RelatedArticlesEditor } from '../../components/RelatedArticlesEditor';
 import { Toast, ToastType } from '../../components/Toast';
-import { Loader2, Plus, Save, Trash2, Edit3, X, AlertTriangle, Settings, LogOut } from 'lucide-react';
+import { Loader2, Plus, Save, Trash2, Edit3, X, AlertTriangle, Settings, LogOut, Eye, Edit2 } from 'lucide-react';
 
 // Single Modal Component for all dialogues
 interface ModalProps {
@@ -159,6 +159,7 @@ export default function AdminClient({
   const [isSubmittingConteudo, setIsSubmittingConteudo] = useState(false);
   const [searchRelated, setSearchRelated] = useState('');
 
+  const [editorTab, setEditorTab] = useState<'write' | 'preview'>('write');
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
   const [modalConfig, setModalConfig] = useState<Omit<ModalProps, 'isOpen' | 'onClose'> | null>(null);
 
@@ -179,9 +180,11 @@ export default function AdminClient({
         setEdicaoImages(slots);
         setEdicaoVideoUrls(sub.videos && sub.videos.length > 0 ? [...sub.videos.map(v => v.url), '', ''].slice(0, 2) : ['', '']);
         setEdicaoRelatedIds(sub.relatedSubmenus ? sub.relatedSubmenus.map(r => r.id) : []);
+        setEditorTab('write');
       }
     } else {
       setEdicaoConteudo(''); setEdicaoGrupo(''); setEdicaoImages([]); setEdicaoVideoUrls(['', '']); setEdicaoRelatedIds([]);
+      setEditorTab('write');
     }
   }, [selectedSubmenuId, initialSubmenus]);
 
@@ -379,222 +382,268 @@ export default function AdminClient({
     });
   };
 
-  return (
-    <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 select-none font-sans text-gray-900">
+    return (
+    <div className="max-w-7xl mx-auto py-8 px-4 space-y-6 select-none font-sans text-gray-900">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <Modal isOpen={!!modalConfig} onClose={closeModal} {...(modalConfig || { title: '', onConfirm: () => { } })} />
 
-      {/* SEÇÃO 1: ESTRUTURA */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
-        <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Link href="/" className="hover:scale-105 active:scale-95 transition-transform duration-200" title="Voltar ao menu inicial">
-                <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-8 w-auto object-contain" />
-              </Link>
-              <div className="h-6 w-[1px] bg-gray-300 mx-1"></div>
-              <span className="text-[#0f2c4a] font-black text-lg tracking-tighter">ConheSiclus</span>
-            </div>
-            <div className="flex items-center gap-2 border-l pl-4 border-gray-200 ml-2">
-              <Plus size={18} className="text-teal-600" />
-              <h2 className="font-bold text-gray-700">Painel Administrativo</h2>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all"
-          >
-            <LogOut size={14} />
-            Sair do Painel
-          </button>
-        </div>
-
-        <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Categoria</label>
-              <input
-                type="text" list="cat-list" value={novaCategoriaNome} onChange={(e) => setNovaCategoriaNome(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
-                placeholder="Ex: Associado"
-              />
-              <datalist id="cat-list">{initialCategorias.map(c => <option key={c.id} value={c.nome} />)}</datalist>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Submenu</label>
-              <input
-                type="text" value={novoSubmenuNome} onChange={(e) => setNovoSubmenuNome(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
-                placeholder="Ex: Cadastro"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-500 uppercase">Grupo (Opcional)</label>
-              <input
-                type="text" value={novoGrupo} onChange={(e) => setNovoGrupo(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
-                placeholder="Ex: Documentos"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleAdicionarEstrutura} disabled={isSubmittingEstrutura}
-              className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg transition-all flex items-center gap-2 disabled:opacity-50"
-            >
-              {isSubmittingEstrutura ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-              Adicionar Estrutura
-            </button>
-            <button
-              onClick={triggerExcluirCategoriaPorNome}
-              className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-lg transition-all flex items-center gap-2"
-            >
-              <Trash2 size={16} />
-              Excluir Categoria (pelo nome)
-            </button>
+      {/* HEADER GLOBAL */}
+      <header className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="hover:scale-105 active:scale-95 transition-transform duration-200" title="Voltar ao menu inicial">
+            <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-10 w-auto object-contain" />
+          </Link>
+          <div className="h-8 w-[1px] bg-gray-300 mx-1"></div>
+          <div>
+            <span className="text-[#0f2c4a] font-black text-xl tracking-tighter block">ConheSiclus</span>
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Painel Administrativo</span>
           </div>
         </div>
-      </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-650 bg-red-50 hover:bg-red-100 rounded-xl transition-all border border-red-100 shadow-sm active:scale-98"
+        >
+          <LogOut size={16} />
+          Sair do Painel
+        </button>
+      </header>
 
-      {/* SEÇÃO 2: EDIÇÃO */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
-        <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
-          <Edit3 size={18} className="text-blue-600" />
-          <h2 className="font-bold text-gray-700">2. Editar Conteúdo</h2>
-        </div>
-
-        <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-500 uppercase font-bold">Selecionar Categoria</label>
-              <select
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 font-bold cursor-pointer transition-all text-gray-800"
-                value={selectedCategoriaId}
-                onChange={(e) => { setSelectedCategoriaId(e.target.value); setSelectedSubmenuId(''); }}
-              >
-                <option value="">Selecione...</option>
-                {initialCategorias.sort(sortCategorias).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
-              </select>
+      {/* GRID DE DUAS COLUNAS */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        {/* COLUNA ESQUERDA: ESTRUTURA & SELEÇÃO (1/3) */}
+        <div className="space-y-6 lg:sticky lg:top-6">
+          
+          {/* CARD 1: SELECIONAR */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
+            <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+              <Settings size={18} className="text-blue-600" />
+              <h2 className="font-bold text-gray-700">1. Selecionar Artigo</h2>
             </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-500 uppercase font-bold">Selecionar Submenu</label>
-              <select
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 font-bold cursor-pointer transition-all disabled:opacity-50 text-gray-800"
-                value={selectedSubmenuId}
-                onChange={(e) => setSelectedSubmenuId(e.target.value)}
-                disabled={!selectedCategoriaId}
-              >
-                <option value="">Selecione...</option>
-                {filteredSubmenus.sort((a, b) => a.nome.localeCompare(b.nome)).map(s => <option key={s.id} value={s.id}>{s.grupo ? `[${s.grupo}] ${s.nome}` : s.nome}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {selectedSubmenuId ? (
-            <div className="space-y-8 animate-in fade-in duration-300">
+            <div className="p-5 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">Grupo (Editar)</label>
+                <label className="text-[10px] font-bold text-gray-500 uppercase font-bold">Categoria</label>
+                <select
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 font-bold cursor-pointer transition-all text-gray-800"
+                  value={selectedCategoriaId}
+                  onChange={(e) => { setSelectedCategoriaId(e.target.value); setSelectedSubmenuId(''); }}
+                >
+                  <option value="">Selecione...</option>
+                  {initialCategorias.sort(sortCategorias).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase font-bold">Submenu</label>
+                <select
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 font-bold cursor-pointer transition-all disabled:opacity-50 text-gray-800"
+                  value={selectedSubmenuId}
+                  onChange={(e) => setSelectedSubmenuId(e.target.value)}
+                  disabled={!selectedCategoriaId}
+                >
+                  <option value="">Selecione...</option>
+                  {filteredSubmenus.sort((a, b) => a.nome.localeCompare(b.nome)).map(s => <option key={s.id} value={s.id}>{s.grupo ? `[${s.grupo}] ${s.nome}` : s.nome}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 2: ADICIONAR ESTRUTURA */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
+            <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+              <Plus size={18} className="text-teal-600" />
+              <h2 className="font-bold text-gray-700">2. Criar Estrutura</h2>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Categoria</label>
                 <input
-                  type="text" value={edicaoGrupo} onChange={(e) => setEdicaoGrupo(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 font-bold"
+                  type="text" list="cat-list" value={novaCategoriaNome} onChange={(e) => setNovaCategoriaNome(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
+                  placeholder="Ex: Associado"
+                />
+                <datalist id="cat-list">{initialCategorias.map(c => <option key={c.id} value={c.nome} />)}</datalist>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Submenu</label>
+                <input
+                  type="text" value={novoSubmenuNome} onChange={(e) => setNovoSubmenuNome(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
+                  placeholder="Ex: Cadastro"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-500 uppercase">Grupo (Opcional)</label>
+                <input
+                  type="text" value={novoGrupo} onChange={(e) => setNovoGrupo(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
+                  placeholder="Ex: Documentos"
                 />
               </div>
 
-              <MediaEditor images={edicaoImages} setImages={setEdicaoImages} videoUrls={edicaoVideoUrls} setVideoUrls={setEdicaoVideoUrls} />
-
-              <RelatedArticlesEditor
-                initialSubmenus={initialSubmenus} initialCategorias={initialCategorias}
-                selectedSubmenuId={selectedSubmenuId} relatedIds={edicaoRelatedIds}
-                setRelatedIds={setEdicaoRelatedIds} searchRelated={searchRelated} setSearchRelated={setSearchRelated}
-              />
-
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase">Texto do Artigo</label>
-                  <div className="flex gap-1">
-                    {['b', 'u', 'mark'].map(t => (
-                      <button key={t} type="button" onClick={() => insertTag(t, t === 'mark' ? 'bg-yellow-200 font-bold' : undefined)} className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 border border-gray-200 rounded text-[10px] font-black uppercase transition-all">{t[0]}</button>
-                    ))}
-                  </div>
-                </div>
-                <textarea
-                  id="conteudo" value={edicaoConteudo} onChange={(e) => setEdicaoConteudo(e.target.value)}
-                  className="w-full h-80 px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-400 font-medium leading-relaxed"
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+              <div className="flex flex-col gap-2 pt-2">
                 <button
-                  onClick={handleSalvarConteudo} disabled={isSubmittingConteudo}
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg flex items-center gap-2 disabled:opacity-50"
+                  onClick={handleAdicionarEstrutura} disabled={isSubmittingEstrutura}
+                  className="w-full justify-center px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 active:scale-98"
                 >
-                  {isSubmittingConteudo ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                  Salvar Alterações
+                  {isSubmittingEstrutura ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                  Adicionar Estrutura
                 </button>
                 <button
-                  onClick={triggerRenomearItem}
-                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center gap-2"
-                >
-                  <Edit3 size={16} />
-                  Renomear Item
-                </button>
-                <button
-                  onClick={triggerExcluirItem}
-                  className="px-6 py-2.5 bg-gray-100 hover:bg-rose-50 text-gray-500 hover:text-rose-600 font-bold rounded-lg flex items-center gap-2"
+                  onClick={triggerExcluirCategoriaPorNome}
+                  className="w-full justify-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-650 font-bold rounded-lg transition-all flex items-center gap-2 active:scale-98"
                 >
                   <Trash2 size={16} />
-                  Excluir Item
+                  Excluir Categoria
                 </button>
               </div>
+            </div>
+          </div>
 
-              <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-100">
-                <button
-                  onClick={triggerRenomearCategoria}
-                  className="px-5 py-2 bg-gray-800 hover:bg-black text-white font-bold rounded-lg flex items-center gap-2 text-xs"
-                >
-                  <Edit3 size={14} />
-                  Renomear Categoria Selecionada
-                </button>
-                <button
-                  onClick={triggerExcluirCategoriaCompleta}
-                  className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg flex items-center gap-2 text-xs"
-                >
-                  <Trash2 size={14} />
-                  Excluir Categoria Selecionada
-                </button>
-              </div>
-            </div>
-          ) : selectedCategoriaId ? (
-            <div className="space-y-6">
-              <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
-                <h3 className="text-gray-500 font-bold mb-1">Nenhum submenu selecionado</h3>
-                <p className="text-xs text-gray-400 mb-6 font-medium">Selecione um submenu acima ou crie um novo agora.</p>
-                <button
-                  onClick={triggerNovoSubmenuAqui}
-                  className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg flex items-center gap-2 shadow-sm"
-                >
-                  <Plus size={18} />
-                  <Settings size={18} />
-                  Novo Submenu Aqui
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
-                <button onClick={triggerRenomearCategoria} className="px-5 py-2 bg-gray-800 hover:bg-black text-white font-bold rounded-lg flex items-center gap-2 text-xs"><Edit3 size={14} />Renomear Categoria Selecionada</button>
-                <button onClick={triggerExcluirCategoriaCompleta} className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg flex items-center gap-2 text-xs"><Trash2 size={14} />Excluir Categoria Selecionada</button>
-              </div>
-            </div>
-          ) : (
-            <div className="p-16 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 font-medium">
-              Selecione uma categoria acima para editar os conteúdos.
-            </div>
-          )}
         </div>
+
+        {/* COLUNA DIREITA: EDIÇÃO DE CONTEÚDO (2/3) */}
+        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden text-sm">
+          <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+            <Edit3 size={18} className="text-blue-600" />
+            <h2 className="font-bold text-gray-700">3. Área de Edição</h2>
+          </div>
+
+          <div className="p-6">
+            {selectedSubmenuId ? (
+              <div className="space-y-8 animate-in fade-in duration-300">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Grupo (Editar)</label>
+                  <input
+                    type="text" value={edicaoGrupo} onChange={(e) => setEdicaoGrupo(e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 font-bold"
+                  />
+                </div>
+
+                <MediaEditor images={edicaoImages} setImages={setEdicaoImages} videoUrls={edicaoVideoUrls} setVideoUrls={setEdicaoVideoUrls} />
+
+                <RelatedArticlesEditor
+                  initialSubmenus={initialSubmenus} initialCategorias={initialCategorias}
+                  selectedSubmenuId={selectedSubmenuId} relatedIds={edicaoRelatedIds}
+                  setRelatedIds={setEdicaoRelatedIds} searchRelated={searchRelated} setSearchRelated={setSearchRelated}
+                />
+
+                {/* TEXT EDITOR WITH TABS */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEditorTab('write')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${editorTab === 'write' ? 'bg-[#0f2c4a] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
+                      >
+                        <Edit2 size={12} />
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEditorTab('preview')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${editorTab === 'preview' ? 'bg-[#0f2c4a] text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100'}`}
+                      >
+                        <Eye size={12} />
+                        Visualizar
+                      </button>
+                    </div>
+
+                    {editorTab === 'write' && (
+                      <div className="flex gap-1">
+                        {['b', 'u', 'mark'].map(t => (
+                          <button key={t} type="button" onClick={() => insertTag(t, t === 'mark' ? 'bg-yellow-200 font-bold' : undefined)} className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 border border-gray-200 rounded text-[10px] font-black uppercase transition-all">{t[0]}</button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {editorTab === 'write' ? (
+                    <textarea
+                      id="conteudo" value={edicaoConteudo} onChange={(e) => setEdicaoConteudo(e.target.value)}
+                      className="w-full h-96 px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-blue-400 font-medium leading-relaxed custom-sidebar-scrollbar"
+                      placeholder="Escreva seu artigo aqui... Aceita HTML padrão."
+                    />
+                  ) : (
+                    <div 
+                      className="w-full h-96 px-6 py-6 bg-white border border-gray-200 rounded-xl overflow-y-auto prose prose-blue max-w-none text-gray-700 leading-relaxed text-lg custom-sidebar-scrollbar"
+                      dangerouslySetInnerHTML={{ __html: edicaoConteudo.replace(/\n/g, '<br/>') || '<em class="text-gray-400">Nenhum conteúdo escrito ainda.</em>' }}
+                    />
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={handleSalvarConteudo} disabled={isSubmittingConteudo}
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 hover:scale-[1.01] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 disabled:opacity-50 transition-all"
+                  >
+                    {isSubmittingConteudo ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                    Salvar Alterações
+                  </button>
+                  <button
+                    onClick={triggerRenomearItem}
+                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 hover:scale-[1.01] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 transition-all"
+                  >
+                    <Edit3 size={16} />
+                    Renomear Item
+                  </button>
+                  <button
+                    onClick={triggerExcluirItem}
+                    className="px-6 py-2.5 bg-gray-100 hover:bg-rose-50 hover:text-rose-600 hover:scale-[1.01] active:scale-98 text-gray-500 font-bold rounded-lg flex items-center gap-2 transition-all"
+                  >
+                    <Trash2 size={16} />
+                    Excluir Item
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-100">
+                  <button
+                    onClick={triggerRenomearCategoria}
+                    className="px-5 py-2 bg-gray-800 hover:bg-black hover:scale-[1.01] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 text-xs transition-all"
+                  >
+                    <Edit3 size={14} />
+                    Renomear Categoria Selecionada
+                  </button>
+                  <button
+                    onClick={triggerExcluirCategoriaCompleta}
+                    className="px-5 py-2 bg-red-600 hover:bg-red-700 hover:scale-[1.01] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 text-xs transition-all"
+                  >
+                    <Trash2 size={14} />
+                    Excluir Categoria Selecionada
+                  </button>
+                </div>
+              </div>
+            ) : selectedCategoriaId ? (
+              <div className="space-y-6">
+                <div className="flex flex-col items-center justify-center p-16 border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+                  <h3 className="text-gray-500 font-bold mb-1 text-sm">Nenhum submenu selecionado</h3>
+                  <p className="text-xs text-gray-400 mb-6 font-medium">Selecione um submenu na barra lateral para começar a editar ou criar.</p>
+                  <button
+                    onClick={triggerNovoSubmenuAqui}
+                    className="px-6 py-3 bg-red-500 hover:bg-red-600 hover:scale-[1.02] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 shadow-sm transition-all"
+                  >
+                    <Plus size={18} />
+                    <Settings size={18} />
+                    Novo Submenu Aqui
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
+                  <button onClick={triggerRenomearCategoria} className="px-5 py-2 bg-gray-800 hover:bg-black hover:scale-[1.01] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 text-xs transition-all"><Edit3 size={14} />Renomear Categoria Selecionada</button>
+                  <button onClick={triggerExcluirCategoriaCompleta} className="px-5 py-2 bg-red-650 hover:bg-red-700 hover:scale-[1.01] active:scale-98 text-white font-bold rounded-lg flex items-center gap-2 text-xs transition-all"><Trash2 size={14} />Excluir Categoria Selecionada</button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-20 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100 italic text-gray-400 font-medium">
+                Selecione uma categoria na barra lateral para editar os conteúdos.
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
 
       <div className="h-10" />
     </div>
   );
 }
-
