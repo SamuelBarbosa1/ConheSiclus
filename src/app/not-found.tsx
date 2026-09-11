@@ -152,7 +152,7 @@ export default function NotFound() {
         }
       ` }} />
 
-            <div className="brand-name">ConheSiclus</div>
+            <div className="brand-name">FaqSiclus</div>
             <div className="center-container">
                 <div className="error-wrapper">
                     {/* 404 */}

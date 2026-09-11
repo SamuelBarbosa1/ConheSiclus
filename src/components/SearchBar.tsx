@@ -70,19 +70,23 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div ref={containerRef} className="flex-1 max-w-xl mx-2 sm:mx-12">
+    <div ref={containerRef} className="flex-1 max-w-xl mx-2 sm:mx-12" role="search" aria-label="Pesquisar tópicos">
       <div className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={20} aria-hidden="true" />
         <input
           type="text"
           placeholder="Como podemos ajudá-lo?"
-          className="w-full pl-11 pr-10 py-2.5 bg-gray-100 border-transparent border focus:border-blue-200 focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-sm font-medium"
+          className="w-full pl-11 pr-10 py-2.5 bg-gray-100 border-transparent border focus:border-blue-200 focus:bg-white rounded-2xl focus:ring-4 focus:ring-blue-50/50 outline-none transition-all text-base font-medium"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
             setIsDropdownOpen(true);
           }}
           onFocus={() => setIsDropdownOpen(true)}
+          aria-label="Pesquisar na base de conhecimento"
+          aria-autocomplete="list"
+          role="combobox"
+          aria-expanded={isDropdownOpen && allMatchingSubmenus.length > 0}
         />
         {searchTerm && (
           <button
@@ -90,38 +94,48 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               setSearchTerm('');
               setIsDropdownOpen(false);
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 text-gray-500 p-1 rounded-full transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 text-gray-600 p-1.5 rounded-full transition-colors"
+            aria-label="Limpar busca"
           >
             <X size={14} />
           </button>
         )}
 
         {isDropdownOpen && allMatchingSubmenus.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 transition-all">
-            <div className="p-2 border-b border-gray-50 bg-gray-50/50">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2">Resultados rápidos</span>
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50 transition-all" role="listbox" aria-label="Resultados da busca">
+            <div className="p-2.5 border-b border-gray-100 bg-gray-50/50">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider px-2">Resultados rápidos</span>
             </div>
             <ul className="max-h-[400px] overflow-y-auto">
               {allMatchingSubmenus.map((sub) => (
                 <li
                   key={sub.id}
                   onClick={() => onResultClick(sub)}
-                  className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-0 transition-colors group"
+                  className="p-4 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors group"
+                  role="option"
+                  tabIndex={0}
+                  aria-label={`${sub.nome} — ${sub.categoriaNome}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onResultClick(sub);
+                    }
+                  }}
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm font-semibold text-gray-800 group-hover:text-blue-700">{highlightText(sub.nome, searchTerm)}</p>
-                      <p className="text-[11px] text-gray-500 mt-0.5">
+                      <p className="text-base font-semibold text-gray-800 group-hover:text-blue-700">{highlightText(sub.nome, searchTerm)}</p>
+                      <p className="text-sm text-gray-600 mt-0.5">
                         {sub.categoriaNome} {sub.grupo ? <>• {highlightText(sub.grupo, searchTerm)}</> : ''}
                       </p>
                     </div>
-                    <Search size={14} className="text-gray-300 group-hover:text-blue-400 mt-1" />
+                    <Search size={14} className="text-gray-400 group-hover:text-blue-400 mt-1" aria-hidden="true" />
                   </div>
                 </li>
               ))}
             </ul>
-            <div className="p-2 bg-gray-50 text-center">
-              <p className="text-[10px] text-gray-400">Clique para selecionar</p>
+            <div className="p-2.5 bg-gray-50 text-center">
+              <p className="text-xs text-gray-500">Clique para selecionar</p>
             </div>
           </div>
         )}

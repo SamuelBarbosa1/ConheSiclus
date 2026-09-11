@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Menu, FileText, X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { Settings, Menu, FileText, X, ChevronRight, Maximize2, Search } from 'lucide-react';
 import Link from 'next/link';
 import { Categoria, Submenu } from '../types';
 import { normalizeText, sortCategorias } from '../lib/utils';
@@ -87,11 +87,16 @@ export default function HomeClient({
 
   return (
     <div className="flex flex-col h-screen w-full font-sans bg-white text-gray-900 overflow-hidden">
-      <header className="h-20 flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-gray-100/80 flex items-center justify-between px-4 sm:px-8 z-30 shadow-sm sticky top-0">
+      {/* HEADER */}
+      <header
+        className="h-20 flex-shrink-0 bg-white/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between px-4 sm:px-8 z-30 shadow-sm sticky top-0"
+        role="banner"
+      >
         <div className="flex items-center gap-2 sm:gap-5">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-700"
+            aria-label="Abrir menu de navegação"
             title="Menu"
           >
             <Menu size={24} />
@@ -105,31 +110,39 @@ export default function HomeClient({
                 setIsSidebarOpen(false);
               }}
               className="cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
+              aria-label="Voltar ao menu inicial"
               title="Voltar ao menu inicial"
             >
               <img src="/ensti-logo.jpg" alt="ENSTI Logo" className="h-12 w-auto object-contain" />
             </button>
-            <div className="h-10 w-[2px] bg-gray-200 mx-1"></div>
-            <span className="text-[#0f2c4a] font-black text-xl sm:text-2xl tracking-tighter">ConheSiclus</span>
+            <div className="h-10 w-[2px] bg-gray-200 mx-1 hidden sm:block" aria-hidden="true"></div>
+            <span className="text-[#0f2c4a] font-black text-xl sm:text-2xl tracking-tighter hidden sm:inline">FaqSiclus</span>
           </div>
         </div>
 
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          isDropdownOpen={isDropdownOpen}
-          setIsDropdownOpen={setIsDropdownOpen}
-          allMatchingSubmenus={allMatchingSubmenus as any}
-          onResultClick={handleResultClick}
-        />
-        {/* Configurações */}
+        {/* Header search bar — only visible when viewing a topic (hero search handles homepage) */}
+        {submenuAtivo && (
+          <div className="hidden sm:block flex-1 max-w-xl mx-4">
+            <SearchBar
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              isDropdownOpen={isDropdownOpen}
+              setIsDropdownOpen={setIsDropdownOpen}
+              allMatchingSubmenus={allMatchingSubmenus as any}
+              onResultClick={handleResultClick}
+            />
+          </div>
+        )}
+
+        {/* Configurações — hidden on very small screens */}
         <div className="flex items-center gap-4">
           <Link
             href="/configuracoes"
-            className="flex items-center gap-2 text-sm text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl transition-all border border-blue-100 shadow-sm"
+            className="flex items-center gap-2 text-sm text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 px-3 sm:px-4 py-2.5 rounded-xl transition-all border border-blue-100 shadow-sm"
+            aria-label="Abrir configurações"
           >
             <Settings size={16} />
-            Configurações
+            <span className="hidden sm:inline">Configurações</span>
           </Link>
         </div>
       </header>
@@ -148,27 +161,37 @@ export default function HomeClient({
           setSubmenuAtivo={setSubmenuAtivo}
         />
 
-        <div className="flex-1 bg-[#f4f7f6] p-4 sm:p-10 overflow-auto w-full">
+        {/* MAIN CONTENT AREA */}
+        <main
+          id="main-content"
+          className="flex-1 bg-[#f4f7f6] p-4 sm:p-10 overflow-auto w-full"
+          role="main"
+          aria-label="Conteúdo principal"
+        >
           {submenuAtivo ? (
             <div key={submenuAtivo.id} className="max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex flex-col lg:flex-row gap-6 items-start">
                 
-                {/* CONTEÚDO PRINCIPAL (Agora no lado ESQUERDO no desktop) */}
-                <div className="flex-1 bg-white p-4 sm:p-8 rounded-xl shadow-sm border border-gray-50 w-full">
+                {/* CONTEÚDO PRINCIPAL */}
+                <article className="flex-1 bg-white p-5 sm:p-8 rounded-xl shadow-sm border border-gray-100 w-full">
                   {/* BREADCRUMBS & META TAGS */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
-                    <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  <nav
+                    className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-200"
+                    aria-label="Navegação de localização"
+                  >
+                    <div className="flex items-center gap-2 text-sm font-bold text-gray-500 uppercase tracking-wider">
                       <button
                         onClick={() => {
                           setSubmenuAtivo(null);
                           setSearchTerm('');
                         }}
-                        className="hover:text-blue-600 transition-colors"
+                        className="hover:text-blue-600 transition-colors focus-visible:underline"
+                        aria-label="Voltar ao início"
                       >
                         Início
                       </button>
-                      <span>/</span>
-                      <span className="text-gray-600">
+                      <span aria-hidden="true">/</span>
+                      <span className="text-gray-700">
                         {(() => {
                           const cat = initialCategorias.find((c) => c.id === submenuAtivo.categoriaId);
                           return cat ? cat.nome : '';
@@ -176,33 +199,33 @@ export default function HomeClient({
                       </span>
                       {submenuAtivo.grupo && (
                         <>
-                          <span>/</span>
-                          <span className="text-gray-600">{submenuAtivo.grupo}</span>
+                          <span aria-hidden="true">/</span>
+                          <span className="text-gray-700">{submenuAtivo.grupo}</span>
                         </>
                       )}
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">
+                      <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-bold">
                         {(() => {
                           const cat = initialCategorias.find((c) => c.id === submenuAtivo.categoriaId);
                           return cat ? cat.nome : '';
                         })()}
                       </span>
                       {submenuAtivo.grupo && (
-                        <span className="px-2.5 py-1 bg-gray-100 text-gray-650 rounded-full text-xs font-bold">
+                        <span className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-bold">
                           {submenuAtivo.grupo}
                         </span>
                       )}
                     </div>
-                  </div>
+                  </nav>
 
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f2c4a] mb-6 text-center">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0f2c4a] mb-6 text-center">
                     {submenuAtivo.nome}
-                  </h2>
+                  </h1>
 
                   <div
-                    className="prose prose-blue max-w-none text-gray-700 leading-relaxed mb-8 text-lg"
+                    className="prose prose-blue max-w-none text-gray-800 leading-relaxed mb-8 text-base sm:text-lg"
                     dangerouslySetInnerHTML={{ __html: submenuAtivo.conteudo.replace(/\n/g, '<br/>') }}
                   />
 
@@ -213,19 +236,27 @@ export default function HomeClient({
                         return (
                           <div 
                             key={img.id} 
-                            className="max-w-3xl mx-auto w-full rounded-xl overflow-hidden border border-gray-100 shadow-md bg-gray-50 group cursor-pointer relative"
+                            className="max-w-3xl mx-auto w-full rounded-xl overflow-hidden border border-gray-200 shadow-md bg-gray-50 group cursor-pointer relative"
                             onClick={(e) => {
                               e.preventDefault();
-                              console.log('Opening image:', finalUrl);
                               setSelectedImage(finalUrl);
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Ampliar imagem ${idx + 1} de ${submenuAtivo.nome}`}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedImage(finalUrl);
+                              }
                             }}
                           >
                             <img
                               src={finalUrl}
-                              alt={`${submenuAtivo.nome} image ${idx + 1}`}
+                              alt={`Imagem ${idx + 1} do tópico ${submenuAtivo.nome}`}
                               className="w-full h-auto object-contain max-h-[500px] transition-all duration-500 group-hover:scale-[1.02]"
                             />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none" aria-hidden="true">
                               <div className="bg-white/90 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
                                 <Maximize2 size={24} className="text-blue-600" />
                               </div>
@@ -240,11 +271,11 @@ export default function HomeClient({
 
                   {/* Assuntos Relacionados (Mobile Only - Bottom) */}
                   {submenuAtivo.relatedSubmenus && submenuAtivo.relatedSubmenus.length > 0 && (
-                    <div className="lg:hidden mt-12 pt-8 border-t border-gray-100">
-                      <h3 className="text-xl font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
-                        <FileText size={20} className="text-blue-600" />
+                    <aside className="lg:hidden mt-12 pt-8 border-t border-gray-200" aria-label="Assuntos relacionados">
+                      <h2 className="text-xl font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
+                        <FileText size={20} className="text-blue-600" aria-hidden="true" />
                         Assuntos Relacionados
-                      </h3>
+                      </h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {submenuAtivo.relatedSubmenus.map((rel) => (
                           <div
@@ -259,26 +290,42 @@ export default function HomeClient({
                                 }
                               }
                             }}
-                            className="p-4 bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 rounded-xl cursor-pointer transition-all group"
+                            className="p-4 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-xl cursor-pointer transition-all group"
+                            role="link"
+                            tabIndex={0}
+                            aria-label={`Ver tópico: ${rel.nome}`}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                for (const cat of initialCategorias) {
+                                  const found = cat.submenus.find(s => s.id === rel.id);
+                                  if (found) {
+                                    setSubmenuAtivo(found);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    break;
+                                  }
+                                }
+                              }
+                            }}
                           >
-                            <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                            <span className="text-base font-medium text-gray-700 group-hover:text-blue-700">
                               {rel.nome}
                             </span>
                           </div>
                         ))}
                       </div>
-                    </div>
+                    </aside>
                   )}
-                </div>
+                </article>
 
                 {/* LADO DIREITO: Assuntos Relacionados (Desktop) */}
                 {submenuAtivo.relatedSubmenus && submenuAtivo.relatedSubmenus.length > 0 && (
-                  <div className="hidden lg:block w-80 flex-shrink-0 sticky top-4">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                      <h3 className="text-lg font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
-                        <FileText size={18} className="text-blue-600" />
+                  <aside className="hidden lg:block w-80 flex-shrink-0 sticky top-4" aria-label="Assuntos relacionados">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                      <h2 className="text-lg font-bold text-[#0f2c4a] mb-4 flex items-center gap-2">
+                        <FileText size={18} className="text-blue-600" aria-hidden="true" />
                         Assuntos Relacionados
-                      </h3>
+                      </h2>
                       <div className="space-y-3">
                         {submenuAtivo.relatedSubmenus.map((rel) => (
                           <div
@@ -293,71 +340,162 @@ export default function HomeClient({
                                 }
                               }
                             }}
-                            className="p-3 bg-gray-50 hover:bg-blue-50 border border-gray-100 hover:border-blue-200 rounded-lg cursor-pointer transition-all group"
+                            className="p-3 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 rounded-lg cursor-pointer transition-all group"
+                            role="link"
+                            tabIndex={0}
+                            aria-label={`Ver tópico: ${rel.nome}`}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                for (const cat of initialCategorias) {
+                                  const found = cat.submenus.find(s => s.id === rel.id);
+                                  if (found) {
+                                    setSubmenuAtivo(found);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    break;
+                                  }
+                                }
+                              }
+                            }}
                           >
-                            <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 leading-tight block">
+                            <span className="text-base font-medium text-gray-700 group-hover:text-blue-700 leading-tight block">
                               {rel.nome}
                             </span>
                           </div>
                         ))}
                       </div>
                     </div>
-                  </div>
+                  </aside>
                 )}
               </div>
             </div>
           ) : (
             <div className="max-w-[1600px] mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
               {/* HERO SECTION */}
-              <div className="bg-gradient-to-br from-[#0f2c4a] via-[#1a3d60] to-[#0a1e33] rounded-3xl p-8 sm:p-12 text-white shadow-lg relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent)]"></div>
+              <div className="bg-gradient-to-br from-[#0f2c4a] via-[#1a3d60] to-[#0a1e33] rounded-3xl p-8 sm:p-12 text-white shadow-lg relative overflow-visible">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent)]" aria-hidden="true"></div>
                 <div className="relative z-10 max-w-2xl">
-                  <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                  <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider">
                     Base de Conhecimento
                   </span>
                   <h1 className="text-3xl sm:text-5xl font-black tracking-tight mt-4 mb-2 bg-gradient-to-r from-white via-blue-50 to-blue-200 bg-clip-text text-transparent">
-                    Bem-vindo ao ConheSiclus
+                    Bem-vindo ao FaqSiclus
                   </h1>
-                  <p className="text-blue-100/80 text-lg font-medium leading-relaxed">
-                    Pesquise acima ou navegue pelas categorias abaixo para acessar tutoriais, manuais e documentações do sistema Siclus.
+                  <p className="text-blue-100/80 text-lg sm:text-xl font-medium leading-relaxed">
+                    Pesquise abaixo ou navegue pelas categorias para acessar tutoriais, manuais e documentações do sistema Siclus.
                   </p>
+
+                  {/* HERO SEARCH — Grande e acessível, sempre visível */}
+                  <div className="mt-6 relative group">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-white/50 group-focus-within:text-white transition-colors" size={22} aria-hidden="true" />
+                    <input
+                      type="text"
+                      placeholder="Como podemos ajudá-lo? (ex: cadastro de associado, relatório financeiro...)"
+                      className="w-full pl-14 pr-12 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 focus:border-white/50 focus:bg-white/15 rounded-2xl focus:ring-4 focus:ring-white/10 outline-none transition-all text-base sm:text-lg font-medium text-white placeholder:text-white/40"
+                      value={searchTerm}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setIsDropdownOpen(true);
+                      }}
+                      onFocus={() => setIsDropdownOpen(true)}
+                      aria-label="Pesquisar na base de conhecimento"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={() => {
+                          setSearchTerm('');
+                          setIsDropdownOpen(false);
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-1.5 rounded-full transition-colors"
+                        aria-label="Limpar busca"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+
+                    {/* Hero search results dropdown */}
+                    {isDropdownOpen && allMatchingSubmenus.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50" role="listbox" aria-label="Resultados da busca">
+                        <div className="p-3 border-b border-gray-100 bg-gray-50/80">
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wider px-2">Resultados rápidos</span>
+                        </div>
+                        <ul className="max-h-[400px] overflow-y-auto">
+                          {allMatchingSubmenus.map((sub) => (
+                            <li
+                              key={sub.id}
+                              onClick={() => handleResultClick(sub)}
+                              className="p-4 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors group"
+                              role="option"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleResultClick(sub);
+                                }
+                              }}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="text-base font-semibold text-gray-800 group-hover:text-blue-700">{sub.nome}</p>
+                                  <p className="text-sm text-gray-500 mt-0.5">
+                                    {sub.categoriaNome} {sub.grupo ? <>• {sub.grupo}</> : ''}
+                                  </p>
+                                </div>
+                                <Search size={16} className="text-gray-300 group-hover:text-blue-400 mt-1" aria-hidden="true" />
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* CATEGORIES GRID */}
-              <div>
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">
+              <section aria-label="Categorias">
+                <h2 className="text-sm font-bold text-gray-600 uppercase tracking-widest mb-6">
                   Navegar por Categorias
-                </h3>
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {initialCategorias.sort(sortCategorias).map((cat) => {
                     const Icone = iconMap[cat.icone || ''] || iconMap[cat.nome] || iconMap.default;
                     return (
                       <div
                         key={cat.id}
-                        className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+                        className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
                         onClick={() => {
                           toggleCategoria(cat.id);
                           setIsSidebarOpen(true);
                         }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Abrir categoria ${cat.nome}, ${cat.submenus.length} tópicos`}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleCategoria(cat.id);
+                            setIsSidebarOpen(true);
+                          }
+                        }}
                       >
                         <div>
                           <div className="flex items-center gap-4 mb-4">
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-[#0f2c4a] group-hover:text-white transition-colors duration-300">
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-[#0f2c4a] group-hover:text-white transition-colors duration-300" aria-hidden="true">
                               <Icone size={22} />
                             </div>
                             <div>
-                              <h4 className="text-lg font-bold text-[#0f2c4a] group-hover:text-blue-700 transition-colors">
+                              <h3 className="text-lg font-bold text-[#0f2c4a] group-hover:text-blue-700 transition-colors">
                                 {cat.nome}
-                              </h4>
-                              <p className="text-xs text-gray-400 font-medium">
+                              </h3>
+                              <p className="text-sm text-gray-600 font-medium">
                                 {cat.submenus.length} {cat.submenus.length === 1 ? 'tópico' : 'tópicos'}
                               </p>
                             </div>
                           </div>
 
                           {cat.submenus && cat.submenus.length > 0 && (
-                            <ul className="space-y-2.5 mt-2">
+                            <ul className="space-y-2.5 mt-2" aria-label={`Tópicos de ${cat.nome}`}>
                               {cat.submenus.slice(0, 3).map((sub) => (
                                 <li
                                   key={sub.id}
@@ -366,10 +504,21 @@ export default function HomeClient({
                                     setSubmenuAtivo(sub);
                                     setIsSidebarOpen(false);
                                   }}
-                                  className="text-sm font-medium text-gray-650 hover:text-blue-600 flex items-center gap-2 transition-colors pl-1"
+                                  className="text-base font-medium text-gray-700 hover:text-blue-600 flex items-center gap-2 transition-colors pl-1 cursor-pointer"
+                                  role="link"
+                                  tabIndex={0}
+                                  aria-label={`Abrir tópico: ${sub.nome}`}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      setSubmenuAtivo(sub);
+                                      setIsSidebarOpen(false);
+                                    }
+                                  }}
                                 >
-                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-blue-400 transition-colors"></span>
-                                  <span className="truncate">{sub.nome}</span>
+                                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-blue-400 transition-colors flex-shrink-0" aria-hidden="true"></span>
+                                  <span>{sub.nome}</span>
                                 </li>
                               ))}
                             </ul>
@@ -377,19 +526,19 @@ export default function HomeClient({
                         </div>
 
                         {cat.submenus.length > 3 && (
-                          <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-sm font-bold text-blue-600 group-hover:text-blue-700">
                             <span>Ver mais {cat.submenus.length - 3} tópicos</span>
-                            <ChevronRight size={14} className="transform group-hover:translate-x-1 transition-transform" />
+                            <ChevronRight size={14} className="transform group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                           </div>
                         )}
                       </div>
                     );
                   })}
                 </div>
-              </div>
+              </section>
             </div>
           )}
-        </div>
+        </main>
       </div>
 
       {/* LIGHTBOX MODAL */}
@@ -397,12 +546,17 @@ export default function HomeClient({
         <div 
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-10 transition-all duration-300"
           onClick={() => setSelectedImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Imagem ampliada"
         >
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true"></div>
           
           <button 
             className="absolute top-6 right-6 p-3 text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all z-[10000]"
             onClick={() => setSelectedImage(null)}
+            aria-label="Fechar imagem ampliada"
+            autoFocus
           >
             <X size={32} />
           </button>
@@ -413,7 +567,7 @@ export default function HomeClient({
           >
             <img 
               src={selectedImage} 
-              alt="Ampliada" 
+              alt="Imagem ampliada" 
               className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl transition-transform duration-300 scale-100"
             />
           </div>

@@ -230,25 +230,61 @@ export default function AdminClient({
 
   // HANDLERS
   const handleAdicionarEstrutura = async () => {
-    const nomeCat = novaCategoriaNome.trim();
+    let nomeCat = novaCategoriaNome.trim();
+    if (!nomeCat && selectedCategoriaId) {
+      const selectedCat = initialCategorias.find(c => c.id === selectedCategoriaId);
+      if (selectedCat) nomeCat = selectedCat.nome;
+    }
+
     if (!nomeCat) return showToast('Informe a categoria.', 'error');
     setIsSubmittingEstrutura(true);
     try {
-      const cat = initialCategorias.find(c => normalizeString(c.nome) === normalizeString(nomeCat));
-      if (!cat) {
-        const fd = new FormData(); fd.append('nome', nomeCat);
-        await criarCategoria(fd); showToast('Categoria criada!'); router.refresh();
-      } else {
-        const nomeSub = novoSubmenuNome.trim();
-        if (!nomeSub) return showToast(`A categoria "${cat.nome}" já existe. Preencha o submenu.`, 'info');
-        const fd = new FormData();
-        fd.append('nome', nomeSub); fd.append('conteudo', '...'); fd.append('categoriaId', cat.id);
-        if (novoGrupo.trim()) fd.append('grupo', novoGrupo.trim());
-        await criarSubmenu(fd); showToast('Submenu adicionado!'); router.refresh();
+      const cat = initialCategorias.find(
+        c => normalizeString(c.nome) === normalizeString(nomeCat) || c.nome.toLowerCase().trim() === nomeCat.toLowerCase().trim()
+      );
+
+      let catId = cat?.id;
+
+      if (!catId) {
+        const fdCat = new FormData();
+        fdCat.append('nome', nomeCat);
+        const resCat = await criarCategoria(fdCat);
+        catId = resCat?.id;
       }
-      setNovaCategoriaNome(''); setNovoSubmenuNome(''); setNovoGrupo('');
-    } catch (e: any) { showToast(e.message, 'error'); }
-    finally { setIsSubmittingEstrutura(false); }
+
+      const nomeSub = novoSubmenuNome.trim();
+      if (nomeSub && catId) {
+        const fdSub = new FormData();
+        fdSub.append('nome', nomeSub);
+        fdSub.append('conteudo', '<p>Escreva o conteúdo do artigo aqui...</p>');
+        fdSub.append('categoriaId', catId);
+        if (novoGrupo.trim()) fdSub.append('grupo', novoGrupo.trim());
+        const resSub = await criarSubmenu(fdSub);
+
+        showToast(cat ? 'Submenu adicionado com sucesso!' : 'Categoria e submenu adicionados com sucesso!');
+        if (catId) setSelectedCategoriaId(catId);
+        if (resSub?.id) setSelectedSubmenuId(resSub.id);
+      } else if (!nomeSub) {
+        if (cat) {
+          showToast(`A categoria "${cat.nome}" já existe. Preencha o submenu.`, 'info');
+          if (catId) setSelectedCategoriaId(catId);
+          return;
+        } else {
+          showToast('Categoria criada! Agora preencha o submenu.', 'success');
+          if (catId) setSelectedCategoriaId(catId);
+        }
+      }
+
+      setNovaCategoriaNome('');
+      setNovoSubmenuNome('');
+      setNovoGrupo('');
+      router.refresh();
+    } catch (e: any) {
+      console.error('Erro ao adicionar estrutura:', e);
+      showToast(e.message || 'Erro ao adicionar estrutura.', 'error');
+    } finally {
+      setIsSubmittingEstrutura(false);
+    }
   };
 
   const handleSalvarConteudo = async () => {
@@ -343,21 +379,29 @@ export default function AdminClient({
   };
 
   const triggerNovoSubmenuAqui = () => {
+    if (!selectedCategoriaId) {
+      return showToast('Selecione uma categoria primeiro no Passo 1.', 'error');
+    }
     openModal({
       title: 'Novo Submenu',
       showInput: true,
       inputPlaceholder: 'Nome',
       showSecondInput: true,
-      secondInputPlaceholder: 'Grupo',
+      secondInputPlaceholder: 'Grupo (Opcional)',
       confirmLabel: 'Criar',
       onConfirm: async (nome, grupo) => {
         if (!nome?.trim()) return showToast('Nome obrigatório', 'error');
         try {
           const fd = new FormData();
-          fd.append('nome', nome.trim()); fd.append('conteudo', '...'); fd.append('categoriaId', selectedCategoriaId);
+          fd.append('nome', nome.trim());
+          fd.append('conteudo', '<p>Escreva o conteúdo do artigo aqui...</p>');
+          fd.append('categoriaId', selectedCategoriaId);
           if (grupo?.trim()) fd.append('grupo', grupo.trim());
-          await criarSubmenu(fd);
-          showToast('Submenu criado!'); closeModal(); router.refresh();
+          const res = await criarSubmenu(fd);
+          showToast('Submenu criado com sucesso!');
+          closeModal();
+          if (res?.id) setSelectedSubmenuId(res.id);
+          router.refresh();
         } catch (e: any) { showToast(e.message, 'error'); }
       }
     });
@@ -395,7 +439,7 @@ export default function AdminClient({
           </Link>
           <div className="h-8 w-[1px] bg-gray-300 mx-1"></div>
           <div>
-            <span className="text-[#0f2c4a] font-black text-xl tracking-tighter block">ConheSiclus</span>
+            <span className="text-[#0f2c4a] font-black text-xl tracking-tighter block">FaqSiclus</span>
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Painel Administrativo</span>
           </div>
         </div>
@@ -455,11 +499,25 @@ export default function AdminClient({
             </div>
             <div className="p-5 space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-500 uppercase">Categoria</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase">Categoria</label>
+                  {selectedCategoriaId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cat = initialCategorias.find(c => c.id === selectedCategoriaId);
+                        if (cat) setNovaCategoriaNome(cat.nome);
+                      }}
+                      className="text-[10px] font-bold text-teal-600 hover:text-teal-700 hover:underline transition-colors cursor-pointer"
+                    >
+                      Usar selecionada
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text" list="cat-list" value={novaCategoriaNome} onChange={(e) => setNovaCategoriaNome(e.target.value)}
                   className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:border-teal-400 focus:bg-white font-bold text-gray-800 placeholder:text-gray-400"
-                  placeholder="Ex: Associado"
+                  placeholder={selectedCategoriaId ? (initialCategorias.find(c => c.id === selectedCategoriaId)?.nome || "Ex: Associados") : "Ex: Associados"}
                 />
                 <datalist id="cat-list">{initialCategorias.map(c => <option key={c.id} value={c.nome} />)}</datalist>
               </div>

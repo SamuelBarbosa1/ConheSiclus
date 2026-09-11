@@ -153,22 +153,22 @@ export async function getMenuCompleto() {
     
     return categorias.map((cat: any) => {
       const catSubmenus = submenus
-        .filter((s: any) => s.categoriaId === cat.id)
+        .filter((s: any) => String(s.categoriaId) === String(cat.id))
         .map((s: any) => ({
           ...s,
           id: s.id.toString(),
           categoriaId: s.categoriaId.toString(),
           images: images
-            .filter((img: any) => img.submenuId === s.id)
+            .filter((img: any) => String(img.submenuId) === String(s.id))
             .map((img: any) => ({ url: img.url, id: img.id.toString() })),
           videos: videos
-            .filter((vid: any) => vid.submenuId === s.id)
+            .filter((vid: any) => String(vid.submenuId) === String(s.id))
             .map((vid: any) => ({ url: vid.url, id: vid.id.toString() })),
           relatedSubmenus: related
-            .filter((rel: any) => rel.submenuId === s.id || rel.relatedSubmenuId === s.id)
+            .filter((rel: any) => String(rel.submenuId) === String(s.id) || String(rel.relatedSubmenuId) === String(s.id))
             .map((rel: any) => {
-              const otherId = rel.submenuId === s.id ? rel.relatedSubmenuId : rel.submenuId;
-              const rSub = submenus.find((sub: any) => sub.id === otherId);
+              const otherId = String(rel.submenuId) === String(s.id) ? rel.relatedSubmenuId : rel.submenuId;
+              const rSub = submenus.find((sub: any) => String(sub.id) === String(otherId));
               return { id: otherId.toString(), nome: rSub?.nome || 'Desconhecido' };
             })
         }));
@@ -192,8 +192,10 @@ export async function criarCategoria(formData: FormData) {
   if (!nome) throw new Error('O nome da categoria é obrigatório.');
 
   try {
-    await pool.query('INSERT INTO categorias (nome, icone) VALUES (?, ?)', [nome, icone || null]);
+    const [result]: any = await pool.query('INSERT INTO categorias (nome, icone) VALUES (?, ?)', [nome, icone || null]);
     revalidatePath('/admin');
+    revalidatePath('/');
+    return { success: true, id: result.insertId.toString(), nome };
   } catch (error) {
     console.error('Erro ao criar categoria:', error);
     throw new Error('Falha ao criar categoria.');
@@ -204,6 +206,8 @@ export async function excluirCategoria(id: string) {
   try {
     await pool.query('DELETE FROM categorias WHERE id = ?', [id]);
     revalidatePath('/admin');
+    revalidatePath('/');
+    return { success: true };
   } catch (error) {
     console.error('Erro ao excluir categoria:', error);
     throw new Error('Falha ao excluir categoria.');
@@ -219,6 +223,8 @@ export async function atualizarCategoria(id: string, formData: FormData) {
   try {
     await pool.query('UPDATE categorias SET nome = ?, icone = ? WHERE id = ?', [nome, icone || null, id]);
     revalidatePath('/admin');
+    revalidatePath('/');
+    return { success: true };
   } catch (error) {
     console.error('Erro ao atualizar categoria:', error);
     throw new Error('Falha ao atualizar categoria.');
@@ -248,10 +254,10 @@ export async function getSubmenus(categoriaId?: string) {
       id: row.id.toString(),
       categoriaId: row.categoriaId.toString(),
       images: images
-        .filter((img: any) => img.submenuId === row.id)
+        .filter((img: any) => String(img.submenuId) === String(row.id))
         .map((img: any) => ({ url: img.url, id: img.id.toString() })),
       videos: videos
-        .filter((vid: any) => vid.submenuId === row.id)
+        .filter((vid: any) => String(vid.submenuId) === String(row.id))
         .map((vid: any) => ({ url: vid.url, id: vid.id.toString() }))
     }));
   } catch (error) {
@@ -317,7 +323,7 @@ export async function criarSubmenu(formData: FormData) {
     await conn.commit();
     revalidatePath('/admin');
     revalidatePath('/');
-    return { success: true };
+    return { success: true, id: submenuId.toString() };
   } catch (error) {
     if (conn) await conn.rollback();
     console.error('Erro ao criar submenu:', error);

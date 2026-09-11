@@ -24,3 +24,179 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* ======================================================
+   ACESSIBILIDADE — Alto Contraste
+   Usa seletores mais genéricos para funcionar com Tailwind v4
+   ====================================================== */
+
+/* Base: fundo escuro e texto branco */
+html.high-contrast,
+html.high-contrast body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Todos os elementos filhos herdam o texto branco */
+html.high-contrast * {
+  color: inherit;
+}
+
+/* Backgrounds brancos → preto */
+html.high-contrast header,
+html.high-contrast main,
+html.high-contrast nav,
+html.high-contrast article,
+html.high-contrast aside,
+html.high-contrast section,
+html.high-contrast div[class*="bg-white"],
+html.high-contrast li[class*="bg-white"] {
+  background-color: #111111 !important;
+  color: #ffffff !important;
+}
+
+/* Backgrounds cinza → cinza escuro */
+html.high-contrast div[class*="bg-gray"],
+html.high-contrast div[class*="bg-\[#f"],
+html.high-contrast nav[class*="bg-\[#f"],
+html.high-contrast main[class*="bg-\[#f"],
+html.high-contrast li[class*="bg-gray"],
+html.high-contrast span[class*="bg-gray"] {
+  background-color: #1a1a1a !important;
+}
+
+/* Backgrounds azuis → azul escuro */
+html.high-contrast div[class*="bg-blue"],
+html.high-contrast span[class*="bg-blue"],
+html.high-contrast a[class*="bg-blue"] {
+  background-color: #1a2a40 !important;
+}
+
+/* Hero gradient → preto sólido */
+html.high-contrast div[class*="bg-gradient"] {
+  background: #0a0a0a !important;
+  border: 2px solid #555555 !important;
+}
+
+/* Textos — forçar cores legíveis */
+html.high-contrast h1,
+html.high-contrast h2,
+html.high-contrast h3,
+html.high-contrast h4,
+html.high-contrast p,
+html.high-contrast span,
+html.high-contrast li,
+html.high-contrast button,
+html.high-contrast a,
+html.high-contrast label {
+  color: #ffffff !important;
+}
+
+/* Links e ações em azul claro */
+html.high-contrast a[class*="text-blue"],
+html.high-contrast button[class*="text-blue"],
+html.high-contrast span[class*="text-blue"] {
+  color: #7db8ff !important;
+}
+
+/* Gradiente de texto no hero → texto branco normal */
+html.high-contrast [class*="bg-clip-text"] {
+  -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
+  background: none !important;
+}
+
+/* Bordas */
+html.high-contrast * {
+  border-color: #444444 !important;
+}
+
+/* Shadows → subtle outline */
+html.high-contrast [class*="shadow"] {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Inputs */
+html.high-contrast input,
+html.high-contrast textarea,
+html.high-contrast select {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #666666 !important;
+}
+
+html.high-contrast input::placeholder,
+html.high-contrast textarea::placeholder {
+  color: #aaaaaa !important;
+}
+
+/* Tags/badges */
+html.high-contrast mark {
+  background-color: #665500 !important;
+  color: #ffffff !important;
+}
+
+/* Backdrop do sidebar mobile */
+html.high-contrast div[class*="bg-black"] {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+/* ======================================================
+   FOCO — Indicadores de navegação por teclado
+   ====================================================== */
+*:focus-visible {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 2px;
+}
+
+html.high-contrast *:focus-visible {
+  outline: 3px solid #ffcc00 !important;
+  outline-offset: 2px;
+}
+
+/* ======================================================
+   TRANSIÇÕES SUAVES
+   ====================================================== */
+html {
+  transition: font-size 0.2s ease;
+}
+
+/* ======================================================
+   SKIP TO CONTENT — Leitores de tela
+   ====================================================== */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: 1rem;
+  background: #0f2c4a;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+}
+
+.skip-to-content:focus {
+  left: 0;
+}
+
+/* ======================================================
+   SCROLLBAR CUSTOMIZADA
+   ====================================================== */
+.custom-sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+.custom-sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
